@@ -9,3 +9,5 @@ fp-info-cache
 *-erc.rpt
 *-drc.rpt
 _autosave-*
+*.kicad_prl
+__pycache__/
