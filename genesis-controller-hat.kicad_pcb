@@ -3880,8 +3880,18 @@
 			)
 		)
 	)
+	(gr_text "Controller HAT"
+		(at 127.69 70.5 0)
+		(layer "F.SilkS")
+		(uuid "d906ed3d-5006-4ebe-905d-1aea24166b37")
+		(effects
+			(font
+				(size 1.5 1.5)
+			)
+		)
+	)
 	(gr_text "Rev A"
-		(at 140 70.5 0)
+		(at 143.27 70.5 0)
 		(layer "F.SilkS")
 		(uuid "f245cc5d-8884-4624-bf69-e582bc6d439f")
 		(effects
