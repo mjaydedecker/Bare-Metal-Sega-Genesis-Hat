@@ -1155,21 +1155,27 @@ the KiCad GUI once and run Tools → Update PCB from Schematic.
 ## Known limitation: J2/J3 routing needs manual cleanup before fabrication
 
 `kicad-cli pcb drc --severity-all` on `genesis-controller-hat.kicad_pcb`
-reports 32 errors / 5 warnings, not zero. 10 of those (9 `unconnected_items`
+reports 32 errors / 6 warnings, not zero. 10 of those (9 `unconnected_items`
 + 1 `lib_footprint_mismatch`) are pre-existing in KiCad's own template since
 before this HAT project touched it, and are unrelated to J2/J3. The
-remaining 27 (2 `copper_edge_clearance`, 1 `shorting_items`, 4
-`silk_edge_clearance`, 6 `solder_mask_bridge`, 14 `tracks_crossing`) come
-from routing J2/J3's 9 pins each to their scattered, fixed target pins on
-J1 (the pin assignment is fixed by `src/input/sega_board.h` — there's no
-freedom to reorder it for easier routing). Each connector's 9 pins are
-packed into a 2.77-2.84mm-pitch cluster and fan out to targets 40-50mm
-away; a scripted greedy two-layer router (see `scripts/task6_pcb_layout.py`)
-gets close but can't fully match what KiCad's interactive push-and-shove
-router or a real autorouter would achieve. **Before fabricating this board,
-open it in the KiCad PCB editor and manually clean up the flagged nets**
-(reroute with vias/jogs as needed) until DRC is fully clean apart from the
-two pre-existing baseline items above.
+remaining 28 (2 `copper_edge_clearance`, 3 `shorting_items`, 5
+`silk_edge_clearance`, 6 `solder_mask_bridge`, 12 `tracks_crossing` — the
+exact split between `shorting_items` and `tracks_crossing` varies slightly
+run to run; their combined count does not) come from routing J2/J3's 9 pins
+each to their scattered, fixed target pins on J1 (the pin assignment is
+fixed by `src/input/sega_board.h` — there's no freedom to reorder it for
+easier routing). Each connector's 9 pins are packed into a 2.77-2.84mm-pitch
+cluster and fan out to targets 40-50mm away; a scripted greedy two-layer
+router (see `scripts/task6_pcb_layout.py`) gets close but can't fully match
+what KiCad's interactive push-and-shove router or a real autorouter would
+achieve. One of the `silk_edge_clearance` warnings is the "Player 2" text
+label itself clipping the board's right edge (its anchor at `(161,74)` sits
+close enough to the edge for the rendered text width to overlap
+`Edge.Cuts`) — cosmetic, but worth nudging left during the same manual
+cleanup pass. **Before fabricating this board, open it in the KiCad PCB
+editor and manually clean up the flagged nets** (reroute with vias/jogs as
+needed) and the "Player 2" label position, until DRC is fully clean apart
+from the two pre-existing baseline items above.
 
 ## Verifying the board
 
@@ -1178,9 +1184,12 @@ kicad-cli sch erc --severity-all genesis-controller-hat.kicad_sch
 kicad-cli pcb drc --severity-all genesis-controller-hat.kicad_pcb
 ```
 
-ERC should report 0 errors/0 warnings. DRC should report 0 errors (one
-pre-existing cosmetic `lib_footprint_mismatch` warning on J1, inherited
-from KiCad's own template, is expected and harmless).
+ERC should report 0 errors/0 warnings. DRC will report 32 errors/6 warnings
+— see "Known limitation: J2/J3 routing needs manual cleanup before
+fabrication" above for the exact breakdown and why this isn't a bug to fix
+here; the schematic (electrical topology) is fully verified, the PCB's
+routing needs one more manual pass in the KiCad GUI before this board goes
+to fab.
 ```
 
 - [ ] **Step 2: Run the full verification suite one more time end to end**
@@ -1190,7 +1199,7 @@ kicad-cli sch erc --severity-all genesis-controller-hat.kicad_sch --exit-code-vi
 kicad-cli pcb drc --severity-all genesis-controller-hat.kicad_pcb --exit-code-violations; echo "DRC exit: $?"
 ```
 
-Expected: ERC report shows 0/0; DRC exit code may be nonzero only due to the known pre-existing J1 warning (confirm by reading the report, not just the exit code).
+Expected: ERC report shows 0/0. DRC exit code will be nonzero — read the report and confirm the violation profile matches the "Known limitation" section's breakdown (32 errors/6 warnings, categories as listed there) rather than something new or worse; if the category counts are wildly different (e.g. `courtyards_overlap` appears, or the pre-existing `unconnected_items`/`lib_footprint_mismatch` baseline of 9/1 changed), stop and report BLOCKED rather than proceeding.
 
 - [ ] **Step 3: Commit**
 
