@@ -48,9 +48,13 @@ def parse(text):
                     elif esc == '"':
                         buf.append('"')
                     else:
-                        # Safe default for any other/unknown escape: drop the
-                        # backslash, keep the next character verbatim.
-                        buf.append(esc)
+                        # Unrecognized escape sequence: raise instead of
+                        # silently dropping the backslash, so any future
+                        # corruption is surfaced immediately rather than
+                        # hidden.
+                        raise ValueError(
+                            f"unrecognized escape sequence '\\{esc}' at position {p}"
+                        )
                     p += 2
                 else:
                     buf.append(text[p])

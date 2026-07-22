@@ -2632,6 +2632,26 @@
 			)
 		)
 	)
+	(gr_text "Genesis Controller HAT"
+		(at 140 58 0)
+		(layer "F.SilkS")
+		(uuid "8ce3182e-550a-48d0-a784-fa68d237a0bf")
+		(effects
+			(font
+				(size 1.5 1.5)
+			)
+		)
+	)
+	(gr_text "Rev A"
+		(at 140 61 0)
+		(layer "F.SilkS")
+		(uuid "f245cc5d-8884-4624-bf69-e582bc6d439f")
+		(effects
+			(font
+				(size 1.5 1.5)
+			)
+		)
+	)
 	(gr_text "Player 2"
 		(at 161 74 0)
 		(layer "F.SilkS")
@@ -2639,84 +2659,6 @@
 		(effects
 			(font
 				(size 1.5 1.5)
-			)
-		)
-	)
-	(gr_text "Extend PCB edge 0.5mm if using SMT header"
-		(at 103 42.5 0)
-		(layer "Dwgs.User")
-		(uuid "5655325a-c0de-4b05-aadb-72ac1902d527")
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.15)
-			)
-			(justify left)
-		)
-	)
-	(gr_text "PoE"
-		(at 161.5 53.64 0)
-		(layer "Dwgs.User")
-		(uuid "6528a76f-b7a7-4621-952f-d7da1058963a")
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.15)
-			)
-		)
-	)
-	(gr_text "DISPLAY (OPTIONAL)"
-		(at 102.5 72 90)
-		(layer "Dwgs.User")
-		(uuid "00000000-0000-0000-0000-0000580cbbff")
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.15)
-			)
-		)
-	)
-	(gr_text "CAMERA (OPTIONAL)"
-		(at 145 88.5 90)
-		(layer "Dwgs.User")
-		(uuid "1811fd1a-b55e-4d16-931d-f9ec6a9e16f7")
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.15)
-			)
-		)
-	)
-	(gr_text "RJ45"
-		(at 176.2 89.84 0)
-		(layer "Dwgs.User")
-		(uuid "00000000-0000-0000-0000-0000580cbbeb")
-		(effects
-			(font
-				(size 2 2)
-				(thickness 0.15)
-			)
-		)
-	)
-	(gr_text "USB"
-		(at 177.724 71.552 0)
-		(layer "Dwgs.User")
-		(uuid "00000000-0000-0000-0000-0000580cbbe9")
-		(effects
-			(font
-				(size 2 2)
-				(thickness 0.15)
-			)
-		)
-	)
-	(gr_text "USB"
-		(at 178.232 52.248 0)
-		(layer "Dwgs.User")
-		(uuid "3b108586-2520-4867-9c38-7334a1000bb5")
-		(effects
-			(font
-				(size 2 2)
-				(thickness 0.15)
 			)
 		)
 	)
@@ -3043,9 +2985,8 @@
 	)
 	(group ""
 		(uuid "ad629bd4-e7e1-40e2-81d6-711e1f1d1fae")
-		(members "1811fd1a-b55e-4d16-931d-f9ec6a9e16f7" "79c07597-5ab9-4d26-b4b3-a70ae9dcd11d"
-			"81e492f6-268f-4ce2-bb45-32834e67e85b" "b6c3db4f-e418-4da3-aef6-5010435bcf13"
-			"d4c39290-1388-499e-abdc-d2c7dce5190a"
+		(members "79c07597-5ab9-4d26-b4b3-a70ae9dcd11d" "81e492f6-268f-4ce2-bb45-32834e67e85b"
+			"b6c3db4f-e418-4da3-aef6-5010435bcf13" "d4c39290-1388-499e-abdc-d2c7dce5190a"
 		)
 	)
 	(embedded_fonts no)
