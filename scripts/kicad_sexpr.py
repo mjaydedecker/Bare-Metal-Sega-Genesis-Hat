@@ -27,7 +27,7 @@ def parse(text):
             buf = []
             while text[p] != '"':
                 if text[p] == '\\':
-                    buf.append(text[p:p + 2])
+                    buf.append(text[p + 1])
                     p += 2
                 else:
                     buf.append(text[p])
