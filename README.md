@@ -111,14 +111,15 @@ your use case, the alternatives are the same as before: a DSUB with a
 narrower bracket, or reverting to the smaller vertical-mount footprint
 (mating face up, not edge-accessible).
 
-## Routing is now fully clean of crossings and shorts
+## DRC is nearly fully clean
 
 `kicad-cli pcb drc --severity-all` on `genesis-controller-hat.kicad_pcb`
-reports 2 errors / 1 warning, not zero — down from 30 errors / 6 warnings
+reports 1 error / 0 warnings, not zero — down from 30 errors / 6 warnings
 before the 2026-07-22 pin reassignment. `tracks_crossing`, `shorting_items`,
 `solder_mask_bridge`, `hole_clearance`, `copper_edge_clearance`,
-`courtyards_overlap`, and `silk_edge_clearance` are all now **zero**.
-Getting the routing-related ones clean took three passes:
+`courtyards_overlap`, `silk_edge_clearance`, and `lib_footprint_mismatch`
+are all now **zero**. Getting the routing-related ones clean took three
+passes:
 
 1. The pin reassignment itself (see `docs/reviews/2026-07-22-pinmap-reassignment.md`)
    eliminated same-layer crossings between J2/J3's own routing, but left
@@ -140,34 +141,44 @@ Getting the routing-related ones clean took three passes:
    `F.Cu` with its own jog around J1's row-A pins (clearing both `+3V3` and
    `/GPIO24`, which stayed put).
 
-Remaining violations, all pre-existing:
+Remaining violation: `unconnected_items` (1) — J1's two +3.3V pins (1 and
+17) aren't tied together on this board, because they're already tied
+together upstream on the Pi itself. Pre-existing in KiCad's own template
+since before this HAT project touched it; unrelated to J2/J3, cannot be
+"fixed" without adding a pointless jumper trace.
 
-- `unconnected_items` (2), `lib_footprint_mismatch` (1) — pre-existing in
-  KiCad's own template since before this HAT project touched it (J1's +5V
-  pins 2/4 are simply unused, and J1's two +3.3V pins, 1 and 17, aren't
-  tied together on this board because they're already tied together
-  upstream on the Pi itself). Unrelated to J2/J3.
+The schematic's cache-drift warning (`lib_symbol_mismatch` on J2/J3's
+`DE9_Socket_MountingHoles` symbol) and the PCB's equivalent
+(`lib_footprint_mismatch` on J1's header footprint), both introduced by
+the KiCad 9→10 upgrade revising those library definitions, are both fixed:
 
-The schematic's equivalent cache-drift warning (`lib_symbol_mismatch` on
-J2/J3's `DE9_Socket_MountingHoles` symbol, introduced by the KiCad 9→10
-upgrade revising that library symbol) has been fixed directly: ERC is now
-**0 errors / 0 warnings**. `scripts/kicad_sexpr.py` gained a
-`refresh_lib_symbol_cache(tree, lib_id)` helper that replaces a schematic's
-stale cached symbol definition with the current one from the system
-library — the schematic-side counterpart to `lib_footprint_mismatch`, which
-is a PCB footprint (not a cached symbol) and would need re-placing the
-footprint to fix the same way, not worth doing for one cosmetic warning.
+- **Schematic:** `scripts/kicad_sexpr.py` gained a
+  `refresh_lib_symbol_cache(tree, lib_id)` helper that replaces a
+  schematic's stale cached symbol definition with the current one from the
+  system library.
+- **PCB:** J1 was removed and replaced with a fresh instance of the same
+  footprint (`Connector_PinSocket_2.54mm:PinSocket_2x20_P2.54mm_Vertical`)
+  loaded straight from the system library, at the same position/rotation/
+  flip state, with every pad's net reassigned by pad number to match. The
+  only real difference between old and new was pad shape (`OVAL` vs
+  `CIRCLE` — cosmetic for a 1.7×1.7mm round pad, since equal width/height
+  makes the two shapes identical) — confirmed by comparing every pad's
+  position, size, and drill before swapping. Fixing this the same way
+  dropped `unconnected_items` from 2 to 1 as a side effect: the swap
+  dropped several stale net-table entries for GPIO pins with no real
+  circuit (I2C, UART, I2S, EEPROM ID — already inert, unreferenced by any
+  track), which happened to include the "J1 pins 2/4 unused +5V" pair.
 
-`silk_edge_clearance` (was 4) is also now fixed: J2/J3's outline-box
-silkscreen (drawn slightly larger than the copper, matching the connector's
-real body) had two sides running right along the board edge — J2's left
-side sat 0.025mm *past* the edge, and both connectors' outer sides dipped
-down into the rounded bottom corners, where the board narrows and the line
-ends up outside the board entirely. Nudged each offending line ~0.3mm
-inward and trimmed its length to stop before the corner begins (at y=96,
-just above where the rounding starts at y=97) — a purely cosmetic change
-to the silkscreen artwork on these two footprint instances, no change to
-pads, copper, or the connector's real footprint envelope.
+`silk_edge_clearance` (was 4) is also fixed: J2/J3's outline-box silkscreen
+(drawn slightly larger than the copper, matching the connector's real
+body) had two sides running right along the board edge — J2's left side
+sat 0.025mm *past* the edge, and both connectors' outer sides dipped down
+into the rounded bottom corners, where the board narrows and the line ends
+up outside the board entirely. Nudged each offending line ~0.3mm inward
+and trimmed its length to stop before the corner begins (at y=96, just
+above where the rounding starts at y=97) — a purely cosmetic change to the
+silkscreen artwork on these two footprint instances, no change to pads,
+copper, or the connector's real footprint envelope.
 
 **Before fabricating this board, resolve the corner-hole trade-off
 documented earlier**; DRC is otherwise clean.
@@ -180,10 +191,10 @@ kicad-cli pcb drc --severity-all genesis-controller-hat.kicad_pcb
 python3 scripts/check_pinmap.py ../Bare-Metal-Sega-Genesis/src/input/sega_board.h
 ```
 
-ERC should report 0 errors / 0 warnings. DRC will report 2 errors/1 warning — see "Routing
-is now fully clean of crossings and shorts" above for
-the exact breakdown and why this isn't a bug to fix here; the schematic
-(electrical topology) is fully verified, the PCB's routing needs one more
-manual pass in the KiCad GUI before this board goes to fab. `check_pinmap.py`
-(also run in CI on every push) confirms the
-schematic's actual wiring matches the firmware repo's `sega_board.h`.
+ERC should report 0 errors / 0 warnings. DRC will report 1 error/0 warnings
+— see "Routing is now fully clean of crossings and shorts" above for the
+one remaining item and why it isn't a bug to fix; the schematic and PCB are
+both fully verified, no manual GUI cleanup pass is needed before fab beyond
+the corner-hole mounting decision. `check_pinmap.py` (also run in CI on
+every push) confirms the schematic's actual wiring matches the firmware
+repo's `sega_board.h`.
