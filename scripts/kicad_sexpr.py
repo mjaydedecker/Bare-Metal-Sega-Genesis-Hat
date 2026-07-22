@@ -81,14 +81,30 @@ def parse(text):
     return tree
 
 
-def serialize(node):
+def serialize(node, depth=0):
     if isinstance(node, Sym):
         return str(node)
     if isinstance(node, str):
         return '"' + (node.replace('\\', '\\\\')
                           .replace('"', '\\"')
                           .replace('\n', '\\n')) + '"'
-    return "(" + " ".join(serialize(c) for c in node) + ")"
+    if not any(isinstance(c, list) for c in node):
+        return "(" + " ".join(serialize(c, depth) for c in node) + ")"
+    indent = "\t" * (depth + 1)
+    out = []
+    buf = []
+    for c in node:
+        if isinstance(c, list):
+            if buf:
+                out.append(" ".join(buf))
+                buf = []
+            out.append(serialize(c, depth + 1))
+        else:
+            buf.append(serialize(c, depth))
+    if buf:
+        out.append(" ".join(buf))
+    body = out[0] + "".join("\n" + indent + o for o in out[1:])
+    return "(" + body + "\n" + ("\t" * depth) + ")"
 
 
 def dumps(tree):
