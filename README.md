@@ -114,11 +114,11 @@ narrower bracket, or reverting to the smaller vertical-mount footprint
 ## Routing is now fully clean of crossings and shorts
 
 `kicad-cli pcb drc --severity-all` on `genesis-controller-hat.kicad_pcb`
-reports 2 errors / 5 warnings, not zero — down from 30 errors / 6 warnings
+reports 2 errors / 1 warning, not zero — down from 30 errors / 6 warnings
 before the 2026-07-22 pin reassignment. `tracks_crossing`, `shorting_items`,
-`solder_mask_bridge`, `hole_clearance`, `copper_edge_clearance`, and
-`courtyards_overlap` are all now **zero**. Getting the routing-related ones
-clean took three passes:
+`solder_mask_bridge`, `hole_clearance`, `copper_edge_clearance`,
+`courtyards_overlap`, and `silk_edge_clearance` are all now **zero**.
+Getting the routing-related ones clean took three passes:
 
 1. The pin reassignment itself (see `docs/reviews/2026-07-22-pinmap-reassignment.md`)
    eliminated same-layer crossings between J2/J3's own routing, but left
@@ -140,15 +140,13 @@ clean took three passes:
    `F.Cu` with its own jog around J1's row-A pins (clearing both `+3V3` and
    `/GPIO24`, which stayed put).
 
-Remaining violations, all pre-existing or cosmetic:
+Remaining violations, all pre-existing:
 
 - `unconnected_items` (2), `lib_footprint_mismatch` (1) — pre-existing in
   KiCad's own template since before this HAT project touched it (J1's +5V
   pins 2/4 are simply unused, and J1's two +3.3V pins, 1 and 17, aren't
   tied together on this board because they're already tied together
   upstream on the Pi itself). Unrelated to J2/J3.
-- `silk_edge_clearance` (4) — cosmetic; a silkscreen clip at the board edge,
-  not a copper/electrical issue.
 
 The schematic's equivalent cache-drift warning (`lib_symbol_mismatch` on
 J2/J3's `DE9_Socket_MountingHoles` symbol, introduced by the KiCad 9→10
@@ -160,9 +158,19 @@ library — the schematic-side counterpart to `lib_footprint_mismatch`, which
 is a PCB footprint (not a cached symbol) and would need re-placing the
 footprint to fix the same way, not worth doing for one cosmetic warning.
 
-**Before fabricating this board, clean up the silkscreen clips noted
-above** and resolve the corner-hole trade-off documented earlier; DRC is
-otherwise clean.
+`silk_edge_clearance` (was 4) is also now fixed: J2/J3's outline-box
+silkscreen (drawn slightly larger than the copper, matching the connector's
+real body) had two sides running right along the board edge — J2's left
+side sat 0.025mm *past* the edge, and both connectors' outer sides dipped
+down into the rounded bottom corners, where the board narrows and the line
+ends up outside the board entirely. Nudged each offending line ~0.3mm
+inward and trimmed its length to stop before the corner begins (at y=96,
+just above where the rounding starts at y=97) — a purely cosmetic change
+to the silkscreen artwork on these two footprint instances, no change to
+pads, copper, or the connector's real footprint envelope.
+
+**Before fabricating this board, resolve the corner-hole trade-off
+documented earlier**; DRC is otherwise clean.
 
 ## Verifying the board
 
@@ -172,7 +180,7 @@ kicad-cli pcb drc --severity-all genesis-controller-hat.kicad_pcb
 python3 scripts/check_pinmap.py ../Bare-Metal-Sega-Genesis/src/input/sega_board.h
 ```
 
-ERC should report 0 errors / 0 warnings. DRC will report 2 errors/5 warnings — see "Routing
+ERC should report 0 errors / 0 warnings. DRC will report 2 errors/1 warning — see "Routing
 is now fully clean of crossings and shorts" above for
 the exact breakdown and why this isn't a bug to fix here; the schematic
 (electrical topology) is fully verified, the PCB's routing needs one more
