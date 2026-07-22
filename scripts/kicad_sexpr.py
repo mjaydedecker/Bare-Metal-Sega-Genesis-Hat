@@ -27,7 +27,20 @@ def parse(text):
             buf = []
             while text[p] != '"':
                 if text[p] == '\\':
-                    buf.append(text[p + 1])
+                    esc = text[p + 1]
+                    # KiCad escape sequences that are NOT "drop the backslash,
+                    # keep the char verbatim": \n is a two-byte escape meaning
+                    # an actual line break, not the literal letter 'n'.
+                    if esc == 'n':
+                        buf.append('\n')
+                    elif esc == '\\':
+                        buf.append('\\')
+                    elif esc == '"':
+                        buf.append('"')
+                    else:
+                        # Safe default for any other/unknown escape: drop the
+                        # backslash, keep the next character verbatim.
+                        buf.append(esc)
                     p += 2
                 else:
                     buf.append(text[p])
@@ -62,7 +75,9 @@ def serialize(node):
     if isinstance(node, Sym):
         return str(node)
     if isinstance(node, str):
-        return '"' + node.replace('\\', '\\\\').replace('"', '\\"') + '"'
+        return '"' + (node.replace('\\', '\\\\')
+                          .replace('"', '\\"')
+                          .replace('\n', '\\n')) + '"'
     return "(" + " ".join(serialize(c) for c in node) + ")"
 
 
