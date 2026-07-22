@@ -688,7 +688,9 @@ EOF
 - Consumes: `kicad_sexpr.make_db9_symbol`, `make_power_symbol`, `make_label`, `make_no_connect`, `root_uuid`, `project_name`.
 - Produces: `J2` symbol instance wired to GPIO4/5/6/7/8/9/10 via matching-text labels (KiCad connects same-named labels anywhere on one sheet without a drawn wire between them — this is why no explicit wire objects back to J1 are needed).
 
-`DE9_Socket_MountingHoles`'s local pin coordinates (from `Connector.kicad_sym`, pins 1-9 in a single column at local x=-7.62, pin 0/PAD at local (0,-15.24)) mean that placing the symbol's own `at` anchor at (50, 250) with rotation 0 puts pin *N*'s absolute connection point at (50 - 7.62, 250 + local_y). Rather than re-deriving that transform by hand for two connectors, the script below hardcodes the nine already-computed absolute pin points per connector — cheaper and less error-prone than doing rotation math in the script for a fixed, one-time placement.
+**Correction from initial planning (found the first time this task was attempted, before any subagent's changes were committed):** the original coordinate table assumed a symbol's absolute pin position is `anchor + local_offset` in both axes. That's wrong for the Y axis — confirmed directly by placing a test instance and reading `kicad-cli sch erc`'s own reported pin coordinates back: KiCad **negates** a symbol's local Y offset when placing it on the sheet (symbol-library coordinates increase upward; page/sheet coordinates increase downward), so the real transform for a rotation-0 placement is `absolute = (anchor_x + local_x, anchor_y - local_y)`. The original table also used an anchor (`(50, 250)`) that isn't itself on KiCad's 1.27mm connection grid, which on its own produced three `endpoint_off_grid` warnings. Both are fixed below: the corrected table below was generated with the right transform from an anchor of `(50.8, 254.0)` — an exact multiple of 1.27mm — and validated directly (0 errors/0 warnings once both J2 and J3 are wired, confirmed before this brief was finalized).
+
+`DE9_Socket_MountingHoles`'s local pin coordinates (from `Connector.kicad_sym`, pins 1-9 in a single column at local x=-7.62, pin 0/PAD at local (0,-15.24)) mean that placing the symbol's own `at` anchor at (50.8, 254.0) with rotation 0 puts pin *N*'s absolute connection point at (50.8 - 7.62, 254.0 - local_y). Rather than re-deriving that transform by hand for two connectors, the script below hardcodes the nine already-computed absolute pin points per connector — cheaper and less error-prone than doing rotation math in the script for a fixed, one-time placement.
 
 - [ ] **Step 1: Write the wiring script**
 
@@ -704,18 +706,18 @@ tree = ks.parse(open(PATH).read())
 proj = ks.project_name(tree)
 root = ks.root_uuid(tree)
 
-# J2 anchor at (50, 250) rotation 0 -> pin N absolute = (50 - 7.62, 250 + local_y)
+# J2 anchor at (50.8, 254.0) rotation 0 -> pin N absolute = (50.8 - 7.62, 254.0 - local_y)
 J2_PINS = {
-    "1": (42.38, 260.16),  # Up      -> GPIO5
-    "6": (42.38, 257.62),  # TL      -> GPIO9
-    "2": (42.38, 255.08),  # Down    -> GPIO6
-    "7": (42.38, 252.54),  # SELECT  -> GPIO4
-    "3": (42.38, 250.00),  # Left    -> GPIO7
-    "8": (42.38, 247.46),  # GND
-    "4": (42.38, 244.92),  # Right   -> GPIO8
-    "9": (42.38, 242.38),  # TR      -> GPIO10
-    "5": (42.38, 239.84),  # +3.3V
-    "0": (50.00, 234.76),  # shell/mounting pad -> NC
+    "1": (43.18, 243.84),  # Up      -> GPIO5
+    "6": (43.18, 246.38),  # TL      -> GPIO9
+    "2": (43.18, 248.92),  # Down    -> GPIO6
+    "7": (43.18, 251.46),  # SELECT  -> GPIO4
+    "3": (43.18, 254.00),  # Left    -> GPIO7
+    "8": (43.18, 256.54),  # GND
+    "4": (43.18, 259.08),  # Right   -> GPIO8
+    "9": (43.18, 261.62),  # TR      -> GPIO10
+    "5": (43.18, 264.16),  # +3.3V
+    "0": (50.80, 269.24),  # shell/mounting pad -> NC
 }
 
 PIN_TO_LABEL = {
@@ -729,7 +731,7 @@ PIN_TO_LABEL = {
 }
 
 ks.ensure_lib_symbol_cached(tree, "Connector:DE9_Socket_MountingHoles")
-tree.append(ks.make_db9_symbol("J2", "DE9_Socket_MountingHoles", (50, 250), proj, root))
+tree.append(ks.make_db9_symbol("J2", "DE9_Socket_MountingHoles", (50.8, 254.0), proj, root))
 
 for pin, label_text in PIN_TO_LABEL.items():
     tree.append(ks.make_label(label_text, J2_PINS[pin]))
@@ -790,6 +792,8 @@ EOF
 - Consumes: same `kicad_sexpr` helpers as Task 4.
 - Produces: fully wired schematic — every net the design needs is complete, and ERC should report zero errors and zero warnings.
 
+**Same transform correction as Task 4 applies here** (`absolute = (anchor_x + local_x, anchor_y - local_y)`, anchor on the 1.27mm grid) — the table below uses anchor `(101.6, 254.0)`, validated together with Task 4's J2 wiring to produce a clean 0 errors/0 warnings result before this brief was finalized.
+
 - [ ] **Step 1: Write the wiring script**
 
 Create `scripts/task5_add_j3.py`:
@@ -804,18 +808,18 @@ tree = ks.parse(open(PATH).read())
 proj = ks.project_name(tree)
 root = ks.root_uuid(tree)
 
-# J3 anchor at (110, 250) rotation 0 -> pin N absolute = (110 - 7.62, 250 + local_y)
+# J3 anchor at (101.6, 254.0) rotation 0 -> pin N absolute = (101.6 - 7.62, 254.0 - local_y)
 J3_PINS = {
-    "1": (102.38, 260.16),  # Up      -> GPIO12
-    "6": (102.38, 257.62),  # TL      -> GPIO22
-    "2": (102.38, 255.08),  # Down    -> GPIO13
-    "7": (102.38, 252.54),  # SELECT  -> GPIO11
-    "3": (102.38, 250.00),  # Left    -> GPIO16
-    "8": (102.38, 247.46),  # GND
-    "4": (102.38, 244.92),  # Right   -> GPIO17
-    "9": (102.38, 242.38),  # TR      -> GPIO23
-    "5": (102.38, 239.84),  # +3.3V
-    "0": (110.00, 234.76),  # shell/mounting pad -> NC
+    "1": (93.98, 243.84),  # Up      -> GPIO12
+    "6": (93.98, 246.38),  # TL      -> GPIO22
+    "2": (93.98, 248.92),  # Down    -> GPIO13
+    "7": (93.98, 251.46),  # SELECT  -> GPIO11
+    "3": (93.98, 254.00),  # Left    -> GPIO16
+    "8": (93.98, 256.54),  # GND
+    "4": (93.98, 259.08),  # Right   -> GPIO17
+    "9": (93.98, 261.62),  # TR      -> GPIO23
+    "5": (93.98, 264.16),  # +3.3V
+    "0": (101.60, 269.24),  # shell/mounting pad -> NC
 }
 
 PIN_TO_LABEL = {
@@ -829,7 +833,7 @@ PIN_TO_LABEL = {
 }
 
 ks.ensure_lib_symbol_cached(tree, "Connector:DE9_Socket_MountingHoles")
-tree.append(ks.make_db9_symbol("J3", "DE9_Socket_MountingHoles", (110, 250), proj, root))
+tree.append(ks.make_db9_symbol("J3", "DE9_Socket_MountingHoles", (101.6, 254.0), proj, root))
 
 for pin, label_text in PIN_TO_LABEL.items():
     tree.append(ks.make_label(label_text, J3_PINS[pin]))
