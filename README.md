@@ -45,10 +45,24 @@ mounting holes" below for a real trade-off this introduced.
 toolchain was updated. ERC/DRC results are unaffected — see "Verifying the
 board" below for current counts.
 
+**2026-07-22 (still later):** replaced the "Genesis Controller HAT" title
+silkscreen text with the "Bare-Metal Genesis" wordmark logo from
+`design_files/Bare-metal Sega Genesis-handoff.zip`
+(`project/kicad/bmg-logo-wordmark.svg`), placed on `F.Silkscreen` centered
+between J1 and the two DB9 connectors (48mm wide, ~14mm tall). The source
+SVG is entirely axis-aligned `<rect>` elements (pixel-art style), so it was
+converted directly to 153 filled `gr_rect` silkscreen shapes at 1:1 fidelity
+rather than traced/vectorized. "Rev A" was moved down slightly to stay clear
+of the logo. No DRC/ERC change from this (silkscreen doesn't need clearance
+from the copper traces it sits over).
+
 ## Files
 
 - `genesis-controller-hat.kicad_pro` / `.kicad_sch` / `.kicad_pcb` — the
   KiCad 10 project.
+- `design_files/` — source design assets (currently the Bare-Metal Genesis
+  logo handoff package); not needed to open or modify the board, kept for
+  provenance.
 - `scripts/` — the editing scripts used to build the schematic and PCB from
   KiCad's official `RaspberryPi-HAT` template. Not needed to open or modify
   the board in the KiCad GUI; kept for provenance/audit.
