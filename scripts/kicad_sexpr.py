@@ -189,6 +189,29 @@ def ensure_lib_symbol_cached(tree, lib_id):
     lib_symbols.append(definition)
 
 
+def refresh_lib_symbol_cache(tree, lib_id):
+    """Replace tree's cached copy of lib_id with the current definition from
+    the system library, fixing ERC's lib_symbol_mismatch (the cached copy in
+    a schematic's own lib_symbols section can drift from the system library
+    after a KiCad version upgrade revises that library's symbol -- seen after
+    upgrading this project from KiCad 9 to 10, which revised Connector's
+    DE9_Socket_MountingHoles). No-op if not yet cached at all; use
+    ensure_lib_symbol_cached for that case instead.
+    """
+    nickname, symbol_name = lib_id.split(":", 1)
+    lib_symbols = next(n for n in tree if get_tag(n) == "lib_symbols")
+    lib_path = _SYMBOL_LIBRARY_PATHS[nickname]
+    lib_tree = parse(open(lib_path).read())
+    definition = next(n for n in lib_tree
+                       if isinstance(n, list) and get_tag(n) == "symbol" and n[1] == symbol_name)
+    definition[1] = lib_id
+    for i, s in enumerate(lib_symbols[1:], start=1):
+        if isinstance(s, list) and s[1] == lib_id:
+            lib_symbols[i] = definition
+            return
+    raise ValueError(f"{lib_id} not cached in tree -- use ensure_lib_symbol_cached instead")
+
+
 def _effects(size="1.27"):
     return [Sym("effects"), [Sym("font"), [Sym("size"), Sym(size), Sym(size)]]]
 

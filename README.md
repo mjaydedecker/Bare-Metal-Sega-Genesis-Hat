@@ -146,13 +146,19 @@ Remaining violations, all pre-existing or cosmetic:
   KiCad's own template since before this HAT project touched it (J1's +5V
   pins 2/4 are simply unused, and J1's two +3.3V pins, 1 and 17, aren't
   tied together on this board because they're already tied together
-  upstream on the Pi itself). Unrelated to J2/J3. The schematic side has the
-  same kind of cache-drift warning: ERC reports 2 `lib_symbol_mismatch`
-  warnings (0 errors) for J2/J3's `DE9_Socket_MountingHoles` symbol, whose
-  cached copy no longer matches KiCad 10's revised system library copy —
-  cosmetic only, same as `lib_footprint_mismatch`.
+  upstream on the Pi itself). Unrelated to J2/J3.
 - `silk_edge_clearance` (4) — cosmetic; a silkscreen clip at the board edge,
   not a copper/electrical issue.
+
+The schematic's equivalent cache-drift warning (`lib_symbol_mismatch` on
+J2/J3's `DE9_Socket_MountingHoles` symbol, introduced by the KiCad 9→10
+upgrade revising that library symbol) has been fixed directly: ERC is now
+**0 errors / 0 warnings**. `scripts/kicad_sexpr.py` gained a
+`refresh_lib_symbol_cache(tree, lib_id)` helper that replaces a schematic's
+stale cached symbol definition with the current one from the system
+library — the schematic-side counterpart to `lib_footprint_mismatch`, which
+is a PCB footprint (not a cached symbol) and would need re-placing the
+footprint to fix the same way, not worth doing for one cosmetic warning.
 
 **Before fabricating this board, clean up the silkscreen clips noted
 above** and resolve the corner-hole trade-off documented earlier; DRC is
@@ -166,8 +172,7 @@ kicad-cli pcb drc --severity-all genesis-controller-hat.kicad_pcb
 python3 scripts/check_pinmap.py ../Bare-Metal-Sega-Genesis/src/input/sega_board.h
 ```
 
-ERC should report 0 errors / 2 warnings (the `lib_symbol_mismatch` cache-drift
-warnings noted above). DRC will report 2 errors/5 warnings — see "Routing
+ERC should report 0 errors / 0 warnings. DRC will report 2 errors/5 warnings — see "Routing
 is now fully clean of crossings and shorts" above for
 the exact breakdown and why this isn't a bug to fix here; the schematic
 (electrical topology) is fully verified, the PCB's routing needs one more
