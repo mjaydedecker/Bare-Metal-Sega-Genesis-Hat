@@ -13,7 +13,7 @@
 - Electrical contract is fixed by `docs/superpowers/specs/2026-07-21-controller-hat-v1-design.md` in this repo: DB9 pin 5 = +3.3V (not 5V), pin 8 = GND, data/SELECT direct to GPIO, no protection components, no ID EEPROM, no stacking header, no LEDs.
 - Pin map is fixed by the firmware repo's `src/input/sega_board.h` (BCM numbering) — this plan is not the source of truth for pin choices, it only implements the already-approved table.
 - Every schematic-editing task must leave `kicad-cli sch erc` reporting the exact violation count stated in that task (not "fewer" or "roughly") — the counts were measured empirically against the real template during planning and are exact targets, not estimates.
-- All new schematic/PCB edits go through `scripts/kicad_sexpr.py`, never hand-typed raw S-expression text pasted into the `.kicad_sch`/`.kicad_pcb` files directly.
+- All schematic edits (Tasks 2-5) go through `scripts/kicad_sexpr.py`, never hand-typed raw S-expression text pasted into `.kicad_sch` directly. PCB edits (Task 6) go through the real `pcbnew` Python module instead — discovered mid-planning to be installed and working in this environment, and preferred for the PCB specifically because it manages net-table bookkeeping for you rather than requiring it be replicated by hand. Neither task hand-edits file text directly.
 
 ---
 
