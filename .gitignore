@@ -11,3 +11,6 @@ fp-info-cache
 _autosave-*
 *.kicad_prl
 __pycache__/
+
+# kicad-happy analysis cache (regenerable)
+analysis/
