@@ -4281,4 +4281,238 @@
 		(at 50.8 269.24)
 		(uuid "c9003d32-de62-4ddf-b26d-bd69e867c0fe")
 	)
+	(symbol
+		(lib_id "Connector:DE9_Socket_MountingHoles")
+		(at 101.6 254.0 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "a86e28a5-80ef-452b-83f7-dd11d3ad9332")
+		(property "Reference" "J3"
+			(at 101.6 236.22 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "DE9_Socket_MountingHoles"
+			(at 101.6 238.125 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_Dsub:DSUB-9_Socket_Vertical_P2.77x2.84mm_MountingHoles"
+			(at 101.6 254.0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 101.6 254.0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project "RaspberryPi-HAT"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
+					(reference "J3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(label "GPIO12{slash}PWM0"
+		(at 93.98 243.84 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "2dc61c82-dbaf-4c7c-af5d-92fed72357fb")
+	)
+	(label "GPIO13{slash}PWM1"
+		(at 93.98 248.92 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "09991245-39dc-456e-bbc7-6495a0eac372")
+	)
+	(label "GPIO16"
+		(at 93.98 254.0 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "0354730e-c969-49c1-8c5f-8ce9d9668fb8")
+	)
+	(label "GPIO17"
+		(at 93.98 259.08 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "6d4f37a9-fc57-447e-b81a-708c302e62a7")
+	)
+	(label "GPIO22"
+		(at 93.98 246.38 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "e3a410f8-5539-4f60-9c31-b6c6bce41a7c")
+	)
+	(label "GPIO11{slash}SPI0.SCLK"
+		(at 93.98 251.46 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "3e8d3f3f-6abb-48e3-a0a0-bdeb1665eae7")
+	)
+	(label "GPIO23"
+		(at 93.98 261.62 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "a90c3ae0-8cdf-4406-95e8-73c6af44f74e")
+	)
+	(symbol
+		(lib_id "power:+3.3V")
+		(at 93.98 264.16 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "3e981ed6-f866-4b76-b35b-910cb9c746eb")
+		(property "Reference" "#PWR903"
+			(at 93.98 267.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+3V3"
+			(at 93.98 259.84000000000003 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 93.98 264.16 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 93.98 264.16 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "bedd9f3a-d871-4c88-89a7-74d865e1af95")
+		)
+		(instances
+			(project "RaspberryPi-HAT"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
+					(reference "#PWR903")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 93.98 256.54 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "f0bd6666-f5da-430b-b79b-af4df98699da")
+		(property "Reference" "#PWR904"
+			(at 93.98 260.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 93.98 252.22000000000003 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 93.98 256.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 93.98 256.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "f3e9ec80-f1f7-4931-8779-a5581355e98c")
+		)
+		(instances
+			(project "RaspberryPi-HAT"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
+					(reference "#PWR904")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(no_connect
+		(at 101.6 269.24)
+		(uuid "0376c6d2-6e05-4da1-9226-835aee8343bc")
+	)
 )
