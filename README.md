@@ -22,7 +22,10 @@ for how it was built.
 crossings, and a GND ground plane pour was added on `B.Cu`. A GitHub Actions
 workflow (`.github/workflows/verify-pinmap.yml`) now checks on every push
 that this board's schematic wiring matches the firmware repo's
-`sega_board.h` exactly.
+`sega_board.h` exactly. The template's camera flex slot cutout (next to J3)
+was also removed — this board has no camera and the slot was only crowding
+J3's mounting plate; the recommended (not required) display flex cutout on
+the left edge was left in place.
 
 ## Files
 
@@ -46,20 +49,23 @@ the KiCad GUI once and run Tools → Update PCB from Schematic.
 ## Known limitation: J2/J3 routing needs manual cleanup before fabrication
 
 `kicad-cli pcb drc --severity-all` on `genesis-controller-hat.kicad_pcb`
-reports 16 errors / 6 warnings, not zero — down from 30 errors / 6 warnings
+reports 15 errors / 6 warnings, not zero — down from 30 errors / 6 warnings
 before the 2026-07-22 pin reassignment. That reassignment's whole purpose
 was eliminating same-layer trace crossings between J2/J3's routing, and it
 worked: `tracks_crossing` and `hole_clearance` are both now **zero** (were
-14 and 4). The remaining violations are all pre-existing categories, not new
-ones:
+14 and 4). Removing the unused camera flex slot afterward dropped
+`copper_edge_clearance` from 2 to 1 (one less board edge for the ground
+pour to clear). The remaining violations are all pre-existing categories,
+not new ones:
 
 - `unconnected_items` (2), `lib_footprint_mismatch` (1) — pre-existing in
   KiCad's own template since before this HAT project touched it (J1's +5V
   pins 2/4 are simply unused, and J1's two +3.3V pins, 1 and 17, aren't
   tied together on this board because they're already tied together
   upstream on the Pi itself). Unrelated to J2/J3.
-- `copper_edge_clearance` (2), `silk_edge_clearance` (5),
-  `solder_mask_bridge` (6) — unchanged from before the reassignment.
+- `copper_edge_clearance` (1), `silk_edge_clearance` (5),
+  `solder_mask_bridge` (6) — unchanged from before the reassignment (aside
+  from the copper_edge_clearance drop noted above).
 - `shorting_items` (6, up from 2) — the trade-off of the reassignment: with
   zero same-layer crossings, the diagonal breakout tracks now graze a few
   unrelated J1 pads along their path instead. This is a smaller and more
@@ -80,7 +86,7 @@ kicad-cli pcb drc --severity-all genesis-controller-hat.kicad_pcb
 python3 scripts/check_pinmap.py ../Bare-Metal-Sega-Genesis/src/input/sega_board.h
 ```
 
-ERC should report 0 errors/0 warnings. DRC will report 16 errors/6 warnings
+ERC should report 0 errors/0 warnings. DRC will report 15 errors/6 warnings
 — see "Known limitation: J2/J3 routing needs manual cleanup before
 fabrication" above for the exact breakdown and why this isn't a bug to fix
 here; the schematic (electrical topology) is fully verified, the PCB's
