@@ -40,10 +40,15 @@ board's bottom edge so a controller cable plugs in horizontally, console-
 style. See "Known limitation: edge-mount connectors overlap the corner
 mounting holes" below for a real trade-off this introduced.
 
+**2026-07-22 (later the same day):** upgraded the project files from KiCad
+9 to KiCad 10 format (`kicad-cli sch upgrade` / `pcb upgrade`) after the
+toolchain was updated. ERC/DRC results are unaffected — see "Verifying the
+board" below for current counts.
+
 ## Files
 
 - `genesis-controller-hat.kicad_pro` / `.kicad_sch` / `.kicad_pcb` — the
-  KiCad 9 project.
+  KiCad 10 project.
 - `scripts/` — the editing scripts used to build the schematic and PCB from
   KiCad's official `RaspberryPi-HAT` template. Not needed to open or modify
   the board in the KiCad GUI; kept for provenance/audit.
@@ -98,7 +103,11 @@ routing regressions:
   KiCad's own template since before this HAT project touched it (J1's +5V
   pins 2/4 are simply unused, and J1's two +3.3V pins, 1 and 17, aren't
   tied together on this board because they're already tied together
-  upstream on the Pi itself). Unrelated to J2/J3.
+  upstream on the Pi itself). Unrelated to J2/J3. The schematic side has the
+  same kind of cache-drift warning: ERC reports 2 `lib_symbol_mismatch`
+  warnings (0 errors) for J2/J3's `DE9_Socket_MountingHoles` symbol, whose
+  cached copy no longer matches KiCad 10's revised system library copy —
+  cosmetic only, same as `lib_footprint_mismatch`.
 - `solder_mask_bridge` (6) — unchanged from before the reassignment.
 - `silk_edge_clearance` (4) — cosmetic; a silkscreen clip at the board edge,
   not a copper/electrical issue.
@@ -122,10 +131,11 @@ kicad-cli pcb drc --severity-all genesis-controller-hat.kicad_pcb
 python3 scripts/check_pinmap.py ../Bare-Metal-Sega-Genesis/src/input/sega_board.h
 ```
 
-ERC should report 0 errors/0 warnings. DRC will report 17 errors/5 warnings
-— see "Known limitation: J2/J3 routing needs manual cleanup before
-fabrication" above for the exact breakdown and why this isn't a bug to fix
-here; the schematic (electrical topology) is fully verified, the PCB's
-routing needs one more manual pass in the KiCad GUI before this board goes
-to fab. `check_pinmap.py` (also run in CI on every push) confirms the
+ERC should report 0 errors / 2 warnings (the `lib_symbol_mismatch` cache-drift
+warnings noted above). DRC will report 17 errors/5 warnings — see "Known
+limitation: J2/J3 routing needs manual cleanup before fabrication" above for
+the exact breakdown and why this isn't a bug to fix here; the schematic
+(electrical topology) is fully verified, the PCB's routing needs one more
+manual pass in the KiCad GUI before this board goes to fab. `check_pinmap.py`
+(also run in CI on every push) confirms the
 schematic's actual wiring matches the firmware repo's `sega_board.h`.
