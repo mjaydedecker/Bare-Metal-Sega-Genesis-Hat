@@ -38,7 +38,7 @@
 | 15 | GPIO22 | `GPIO22` |
 | 16 | GPIO23 | `GPIO23` |
 
-**Unused GPIO pins to strip (their template labels get deleted, not wired):** GPIO2, GPIO3, GPIO14, GPIO15, GPIO18, GPIO19, GPIO20, GPIO21, GPIO24, GPIO25, GPIO26, GPIO27 (physical pins 3, 5, 8, 10, 12, 35, 38, 40, 18, 22, 37, 13). GPIO0/GPIO1 (physical pins 27/28) have no separate label in the template — they're wired directly to the ID EEPROM sub-circuit, removed in Task 2.
+**Unused GPIO pins to strip (their template labels get deleted, not wired):** GPIO2, GPIO3, GPIO14, GPIO15, GPIO18, GPIO19, GPIO20, GPIO21, GPIO24, GPIO25, GPIO26, GPIO27 (physical pins 3, 5, 8, 10, 12, 35, 38, 40, 18, 22, 37, 13). GPIO0/GPIO1 (physical pins 27/28) connect to the ID EEPROM sub-circuit via two same-name local-label pairs, `ID_SDA` and `ID_SCL` (confirmed by inspection — not "wired directly" as first assumed during planning; see Task 2's correction note), removed in Task 2 along with the EEPROM circuit itself.
 
 **Genesis DB9 pinout (from `src/input/sega_board.h` / the approved HAT spec):**
 
@@ -372,13 +372,41 @@ EOF
 
 The template targets full official HAT certification (ID EEPROM on GPIO0/1). Per the approved design spec this board skips that — bare-metal kernel, no device-tree consumer. This task removes that sub-circuit and the unused +5V rail, and fixes the two remaining "power pin not driven" errors that are inherent to how the template represents +3.3V/GND (their power symbols have `power_in` pins, not `power_out` — a `PWR_FLAG` is the standard KiCad idiom for telling ERC the net is driven from off-sheet).
 
+**Correction from initial planning (found while first attempting this task, before any subagent touched it):** the plan originally assumed GPIO0/GPIO1 (physical pins 27/28) are wired to the EEPROM sub-circuit with no separate label, "directly." That's wrong — they connect via two ordinary same-name local-label pairs, `ID_SDA` (one instance next to J1's pin, one instance next to the EEPROM's R1/R2 pins) and `ID_SCL` (same pattern), exactly like this project's own GPIOxx-labeled pins. Deleting only the EEPROM symbols (as originally planned) leaves those labels and their connecting wires as orphaned stubs, which ERC reports as a pile of new `wire_dangling`/`unconnected_wire_endpoint`/`label_dangling` violations instead of the expected clean baseline drop. The corrected removal set below deletes both `ID_SDA`/`ID_SCL` label instances too, plus the wires/no-connects/junctions that only existed to serve the now-deleted EEPROM circuit, and marks J1's now-bare pins 27/28 as intentionally unused with explicit no-connect flags (the same pattern Tasks 4/5 already use for the DB9 shell pin).
+
+**Also discovered while first attempting this task:** `scripts/kicad_sexpr.py`'s `make_power_symbol`/`make_db9_symbol`/`make_label`/`make_no_connect` (written in Task 1, never actually exercised until this task called `make_power_symbol` for the first time) built numeric/keyword tokens as plain Python strings, which the serializer then wrapped in quotes — e.g. `(at "55.88" "30.0" "0")` instead of KiCad's expected bare `(at 55.88 30.0 0)`. Worse, referencing a brand-new `lib_id` (`power:PWR_FLAG`) that has no cached copy in the schematic's own `lib_symbols` section doesn't fail gracefully in KiCad 9 — it segfaults `kicad-cli` outright, and the cached copy must be renamed to the full `nickname:SymbolName` form (`power:PWR_FLAG`, not the library's own bare `PWR_FLAG`) or the same crash happens even with a cache entry present. `scripts/kicad_sexpr.py` has already been fixed for both issues (token quoting, and a new `ensure_lib_symbol_cached(tree, lib_id)` helper) as part of validating this corrected task — the fix needs to be committed as its own commit before Task 2's actual changes, same pattern as Task 1's post-review escape-handling fixes. **Tasks 4 and 5 must also call `ks.ensure_lib_symbol_cached(tree, "Connector:DE9_Socket_MountingHoles")` before appending a DB9 symbol instance, for the same reason** — that lib_id isn't cached in the template either.
+
 **Files:**
+- Modify: `scripts/kicad_sexpr.py` (bugfix commit, see above)
 - Create: `scripts/task2_strip_unused.py`
 - Modify: `genesis-controller-hat.kicad_sch`
 
 **Interfaces:**
-- Consumes: `scripts/kicad_sexpr.py`'s `parse`, `dumps`, `remove_symbols_by_ref`, `make_power_symbol`, `root_uuid`, `project_name`.
-- Produces: schematic with EEPROM/+5V circuitry gone and `+3.3V`/`GND` nets validly driven, ready for Task 3 to prune unused GPIO labels.
+- Consumes: `scripts/kicad_sexpr.py`'s `parse`, `dumps`, `remove_symbols_by_ref`, `remove_labels_by_text`, `make_power_symbol`, `ensure_lib_symbol_cached`, `root_uuid`, `project_name`, `get_tag`.
+- Produces: schematic with EEPROM/+5V circuitry gone (including its label/wire/no-connect/junction remnants) and `+3.3V`/`GND` nets validly driven, ready for Task 3 to prune unused GPIO labels.
+
+- [ ] **Step 0: Commit the kicad_sexpr.py bugfix first**
+
+Verify `scripts/kicad_sexpr.py` has both fixes already applied: every `Sym(str(x))`-style wrapping around numeric "at"/"unit"/"size" tokens in `make_power_symbol`, `make_db9_symbol`, `make_label`, `make_no_connect`, `_effects` (not bare `str(x)`), and an `ensure_lib_symbol_cached(tree, lib_id)` function that renames the extracted definition's own name to the full `lib_id` before appending it to `lib_symbols`. Commit this module fix on its own before writing Task 2's script:
+
+```bash
+git add scripts/kicad_sexpr.py
+git commit -m "$(cat <<'EOF'
+Fix token quoting and add lib_symbols caching to kicad_sexpr
+
+make_power_symbol/make_db9_symbol/make_label/make_no_connect built
+numeric and keyword tokens as plain Python strings, which the serializer
+then quoted -- e.g. (at "55.88" "30.0" "0") instead of KiCad's expected
+bare (at 55.88 30.0 0). Separately, referencing a lib_id with no cached
+copy in the schematic's own lib_symbols section crashes kicad-cli outright
+rather than failing gracefully, and the cached copy must be keyed by the
+full "nickname:SymbolName" form to be found at all. Both were unexercised
+until Task 2 became the first caller of make_power_symbol.
+
+Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>
+EOF
+)"
+```
 
 - [ ] **Step 1: Write the strip script**
 
@@ -392,6 +420,24 @@ import kicad_sexpr as ks
 PATH = "genesis-controller-hat.kicad_sch"
 tree = ks.parse(open(PATH).read())
 
+
+def pts_of(n):
+    return [c for c in n if isinstance(c, list) and ks.get_tag(c) == "pts"][0][1:]
+
+
+def all_points_in_box(n, x0, x1, y0, y1):
+    return all(x0 <= float(pt[1]) <= x1 and y0 <= float(pt[2]) <= y1 for pt in pts_of(n))
+
+
+def at_in_box(n, x0, x1, y0, y1):
+    at = next(c for c in n if isinstance(c, list) and ks.get_tag(c) == "at")
+    return x0 <= float(at[1]) <= x1 and y0 <= float(at[2]) <= y1
+
+
+def touches_point(n, px, py):
+    return any(abs(float(pt[1]) - px) < 0.01 and abs(float(pt[2]) - py) < 0.01 for pt in pts_of(n))
+
+
 # EEPROM sub-circuit (C1 decoupling cap, R1/R2 pull-ups, JP1 disable jumper,
 # U1 the EEPROM itself) and its three local power-flag symbols.
 eeprom_refs = {"C1", "R1", "JP1", "R2", "U1", "#PWR0101", "#PWR0102", "#PWR0103"}
@@ -399,17 +445,64 @@ removed_eeprom = ks.remove_symbols_by_ref(tree, eeprom_refs)
 assert removed_eeprom == 8, f"expected to remove 8 EEPROM-related symbols, removed {removed_eeprom}"
 
 # +5V is never used by this design (Genesis pads are powered at 3.3V per the
-# approved spec) — remove the header's +5V power flag entirely.
+# approved spec) -- remove the header's +5V power flag entirely.
 removed_5v = ks.remove_symbols_by_ref(tree, {"#PWR01"})
 assert removed_5v == 1, f"expected to remove 1 symbol (#PWR01), removed {removed_5v}"
 
+# GPIO0/GPIO1 connect to the EEPROM circuit via two same-name local-label
+# pairs (ID_SDA, ID_SCL) -- one instance next to J1's pins, one next to the
+# now-deleted R1/R2. Delete all 4 label instances; the pins become bare and
+# get explicit no-connect flags below.
+removed_labels = ks.remove_labels_by_text(tree, {"ID_SDA", "ID_SCL"})
+assert removed_labels == 4, f"expected to remove 4 label instances, removed {removed_labels}"
+
+# Wires/no-connects/junctions that only existed to serve the deleted EEPROM
+# circuit and +5V flag. Confirmed by inspection to be the complete set --
+# the EEPROM sub-circuit's own wiring sits entirely within one bounding box
+# on the sheet, plus two label-side stub wires running out to where the
+# J1-side ID_SDA/ID_SCL label instances used to sit, plus one short +5V tie.
+before = len(tree)
+tree[:] = [n for n in tree if not (
+    isinstance(n, list) and ks.get_tag(n) == "wire" and (
+        all_points_in_box(n, 60, 111, 160, 195) or       # EEPROM sub-circuit wiring
+        all_points_in_box(n, 74, 78, 22, 30) or          # +5V tie stub
+        touches_point(n, 31.75, 60.96) or                # J1-side ID_SDA label stub
+        touches_point(n, 100.33, 60.96)                  # J1-side ID_SCL label stub
+    )
+)]
+removed_wires = before - len(tree)
+assert removed_wires == 23, f"expected to remove 23 wires, removed {removed_wires}"
+
+before = len(tree)
+tree[:] = [n for n in tree if not (
+    isinstance(n, list) and ks.get_tag(n) == "no_connect" and at_in_box(n, 60, 111, 160, 195)
+)]
+removed_nc = before - len(tree)
+assert removed_nc == 3, f"expected to remove 3 no_connect flags, removed {removed_nc}"
+
+before = len(tree)
+tree[:] = [n for n in tree if not (
+    isinstance(n, list) and ks.get_tag(n) == "junction" and at_in_box(n, 60, 111, 160, 195)
+)]
+removed_junctions = before - len(tree)
+assert removed_junctions == 6, f"expected to remove 6 junctions, removed {removed_junctions}"
+
+# Mark J1's now-bare GPIO0 (pin 27) and GPIO1 (pin 28) pins as intentionally
+# unused -- same pattern as the DB9 shell pin's no-connect in Tasks 4/5.
+tree.append(ks.make_no_connect((60.96, 60.96)))
+tree.append(ks.make_no_connect((73.66, 60.96)))
+
 # #PWR04 (+3.3V) and #PWR02 (GND) are power_in pins with nothing driving
 # them per ERC's rules; a PWR_FLAG on each net tells ERC the net is driven
-# from outside this sheet (by the Raspberry Pi itself).
+# from outside this sheet (by the Raspberry Pi itself). Placed exactly
+# coincident with #PWR04/#PWR02's own positions -- a PWR_FLAG anywhere else
+# forms its own isolated net instead of joining the one it's meant to prove
+# is driven.
 proj = ks.project_name(tree)
 root = ks.root_uuid(tree)
-tree.append(ks.make_power_symbol("power:PWR_FLAG", "#FLG901", "PWR_FLAG", (55.88, 30.0), proj, root))
-tree.append(ks.make_power_symbol("power:PWR_FLAG", "#FLG902", "PWR_FLAG", (76.20, 85.0), proj, root))
+ks.ensure_lib_symbol_cached(tree, "power:PWR_FLAG")
+tree.append(ks.make_power_symbol("power:PWR_FLAG", "#FLG901", "PWR_FLAG", (55.88, 24.13), proj, root))
+tree.append(ks.make_power_symbol("power:PWR_FLAG", "#FLG902", "PWR_FLAG", (76.20, 80.01), proj, root))
 
 open(PATH, "w").write(ks.dumps(tree))
 print("Task 2 edits applied.")
@@ -421,7 +514,7 @@ print("Task 2 edits applied.")
 python3 scripts/task2_strip_unused.py
 ```
 
-Expected output: `Task 2 edits applied.` (the two `assert` lines are the real check — if either count is wrong the script raises `AssertionError` and exits nonzero before writing anything).
+Expected output: `Task 2 edits applied.` (every `assert` is a real check — if any count is wrong the script raises `AssertionError` and exits nonzero before writing anything).
 
 - [ ] **Step 3: Verify against the exact expected ERC count**
 
@@ -431,9 +524,15 @@ grep -c "; error" genesis-controller-hat-erc.rpt
 grep -c "; warning" genesis-controller-hat-erc.rpt
 ```
 
-Expected: **26 errors, 0 warnings.** (29 baseline errors − 3 `power_pin_not_driven` = 26, all now `label_dangling`; the 2 `R_Small` mismatch warnings vanished because `R1`/`R2` are gone.)
+Expected: **26 errors, 0 warnings**, and `kicad-cli` must load the file without a crash (a segfault or "Failed to load schematic" here means one of the two `kicad_sexpr.py` bugs from Step 0 crept back in — check that `at`/`unit` tokens are bare `Sym`, not quoted strings, and that `ensure_lib_symbol_cached` renamed the cached entry to the full `power:PWR_FLAG` form). All 26 remaining errors should be `label_dangling` — confirm with:
 
-If the count is off, check the report contents directly (`cat genesis-controller-hat-erc.rpt`) before re-running — do not just re-run the script, since it isn't idempotent (running it twice will fail the `assert` on the second pass because the symbols are already gone; that failure is itself expected/correct, not a bug).
+```bash
+grep -oP '^\[[a-z_]+\]' genesis-controller-hat-erc.rpt | sort | uniq -c
+```
+
+Expected: `26 [label_dangling]` and nothing else.
+
+If the count is off, check the report contents directly (`cat genesis-controller-hat-erc.rpt`) before re-running — do not just re-run the script, since it isn't idempotent (running it twice will fail an `assert` on the second pass because the symbols/labels/wires are already gone; that failure is itself expected/correct, not a bug).
 
 - [ ] **Step 4: Commit**
 
@@ -445,9 +544,10 @@ Strip ID EEPROM circuit and +5V from the HAT schematic
 This board is not chasing official HAT certification (bare-metal kernel,
 no device-tree consumer for the EEPROM) and never uses 5V (Genesis pads
 are powered at 3.3V per the approved design spec), so both are removed
-rather than left as dead weight. PWR_FLAG symbols replace the ERC
-correctness those deleted parts incidentally provided for the +3.3V/GND
-nets.
+rather than left as dead weight, along with the ID_SDA/ID_SCL label pairs
+and wiring that only existed to serve the EEPROM circuit. PWR_FLAG symbols
+replace the ERC correctness those deleted parts incidentally provided for
+the +3.3V/GND nets; GPIO0/1 get explicit no-connect flags.
 
 Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>
 EOF
@@ -582,6 +682,7 @@ PIN_TO_LABEL = {
     "9": "GPIO10{slash}SPI0.MOSI",
 }
 
+ks.ensure_lib_symbol_cached(tree, "Connector:DE9_Socket_MountingHoles")
 tree.append(ks.make_db9_symbol("J2", "DE9_Socket_MountingHoles", (50, 250), proj, root))
 
 for pin, label_text in PIN_TO_LABEL.items():
@@ -681,6 +782,7 @@ PIN_TO_LABEL = {
     "9": "GPIO23",
 }
 
+ks.ensure_lib_symbol_cached(tree, "Connector:DE9_Socket_MountingHoles")
 tree.append(ks.make_db9_symbol("J3", "DE9_Socket_MountingHoles", (110, 250), proj, root))
 
 for pin, label_text in PIN_TO_LABEL.items():
