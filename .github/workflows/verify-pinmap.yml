@@ -1,0 +1,36 @@
+name: Verify pin map matches firmware
+
+# The firmware repo's src/input/sega_board.h is the single source of truth
+# for which BCM GPIO drives each DB9 signal (see that file's own header
+# comment, and this repo's docs/superpowers/specs design spec). This
+# workflow fails if this HAT's schematic wiring ever disagrees with it.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check-pinmap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out this repo
+        uses: actions/checkout@v4
+
+      - name: Check out firmware repo (for sega_board.h only)
+        uses: actions/checkout@v4
+        with:
+          repository: mjaydedecker/Bare-Metal-Sega-Genesis
+          sparse-checkout: |
+            src/input/sega_board.h
+          sparse-checkout-cone-mode: false
+          path: firmware-repo
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Compare HAT schematic wiring against sega_board.h
+        run: python3 scripts/check_pinmap.py firmware-repo/src/input/sega_board.h
