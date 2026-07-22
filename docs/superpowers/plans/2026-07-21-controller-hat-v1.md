@@ -560,12 +560,14 @@ EOF
 
 Twelve of the header's 26 labeled GPIO pins aren't part of the Genesis pin map (I2C, UART, I2S, and four spares) — per the approved spec these stay unpopulated on the HAT, so their dangling labels should be deleted rather than left as permanent ERC noise.
 
+**Correction from initial planning (found the first time this task was attempted, before any subagent's changes were committed):** every one of these 26 GPIO labels sits on its own short wire stub running from the label's position to J1's actual pin — the label is never directly coincident with the pin (same pattern already discovered and fixed for `ID_SDA`/`ID_SCL` in Task 2). Deleting only the label text (as originally planned) leaves that wire stub orphaned, which ERC reports as a new `pin_not_connected` error plus an `unconnected_wire_endpoint` warning per deleted label — 12 of each, turning the expected clean 14/0 result into 26 errors / 12 warnings instead. The corrected script below also deletes each label's connecting wire and marks the now-bare J1 pin with an explicit no-connect flag, exactly mirroring Task 2's fix for `ID_SDA`/`ID_SCL`.
+
 **Files:**
 - Create: `scripts/task3_remove_unused_labels.py`
 - Modify: `genesis-controller-hat.kicad_sch`
 
 **Interfaces:**
-- Consumes: `kicad_sexpr.remove_labels_by_text`.
+- Consumes: `kicad_sexpr.remove_labels_by_text`, `make_no_connect`, `get_tag`.
 - Produces: schematic with exactly the 14 labels this design uses remaining, ready for Task 4/5 to wire them.
 
 - [ ] **Step 1: Write the removal script**
@@ -591,6 +593,49 @@ UNUSED_LABELS = {
 removed = ks.remove_labels_by_text(tree, UNUSED_LABELS)
 assert removed == 12, f"expected to remove 12 labels, removed {removed}"
 
+
+def pts_of(n):
+    return [c for c in n if isinstance(c, list) and ks.get_tag(c) == "pts"][0][1:]
+
+
+def matches_pair(n, p1, p2):
+    pts = pts_of(n)
+    coords = {(round(float(p[1]), 2), round(float(p[2]), 2)) for p in pts}
+    return coords == {(round(p1[0], 2), round(p1[1], 2)), (round(p2[0], 2), round(p2[1], 2))}
+
+
+# Each deleted label sat at one end of a short wire whose other end is J1's
+# actual pin. Confirmed by inspection against the pre-removal file (each pair
+# below is (label-side endpoint, pin-side endpoint)); deleting the label
+# without also deleting this wire leaves a dangling stub.
+WIRE_PAIRS = [
+    ((73.66, 76.2), (100.33, 76.2)), ((31.75, 71.12), (60.96, 71.12)),
+    ((31.75, 43.18), (60.96, 43.18)), ((31.75, 73.66), (60.96, 73.66)),
+    ((73.66, 35.56), (100.33, 35.56)), ((73.66, 38.1), (100.33, 38.1)),
+    ((60.96, 30.48), (31.75, 30.48)), ((73.66, 53.34), (100.33, 53.34)),
+    ((31.75, 33.02), (60.96, 33.02)), ((73.66, 40.64), (100.33, 40.64)),
+    ((73.66, 73.66), (100.33, 73.66)), ((73.66, 48.26), (100.33, 48.26)),
+]
+# The pin-side endpoint of each pair above -- where a no-connect flag goes
+# once the label and its wire are gone, so J1's now-bare pin reads as
+# intentionally unused rather than a dangling connection.
+PIN_SIDE_POINTS = [
+    (60.96, 30.48), (60.96, 33.02), (73.66, 35.56), (73.66, 38.1), (73.66, 40.64),
+    (73.66, 48.26), (60.96, 43.18), (73.66, 53.34), (60.96, 71.12), (73.66, 73.66),
+    (60.96, 73.66), (73.66, 76.2),
+]
+
+before = len(tree)
+tree[:] = [n for n in tree if not (
+    isinstance(n, list) and ks.get_tag(n) == "wire" and
+    any(matches_pair(n, a, b) for a, b in WIRE_PAIRS)
+)]
+removed_wires = before - len(tree)
+assert removed_wires == 12, f"expected to remove 12 wires, removed {removed_wires}"
+
+for point in PIN_SIDE_POINTS:
+    tree.append(ks.make_no_connect(point))
+
 open(PATH, "w").write(ks.dumps(tree))
 print("Task 3 edits applied.")
 ```
@@ -611,7 +656,7 @@ grep -c "; error" genesis-controller-hat-erc.rpt
 grep -c "; warning" genesis-controller-hat-erc.rpt
 ```
 
-Expected: **14 errors, 0 warnings** — exactly the 14 `label_dangling` errors for the pins this design does use (GPIO4/5/6/7/8/9/10/11/12/13/16/17/22/23), unresolved until Tasks 4–5 wire them.
+Expected: **14 errors, 0 warnings** — exactly the 14 `label_dangling` errors for the pins this design does use (GPIO4/5/6/7/8/9/10/11/12/13/16/17/22/23), unresolved until Tasks 4–5 wire them. If you see 26 errors / 12 warnings instead, the wire-cleanup step didn't run or didn't match — check the `WIRE_PAIRS` coordinates against the actual file rather than re-running blindly.
 
 - [ ] **Step 4: Commit**
 
@@ -622,8 +667,9 @@ Remove header labels for GPIO pins this HAT does not use
 
 I2C, UART, I2S, and the four spare GPIOs are reserved by the firmware
 repo's electrical contract but not populated on this board; deleting
-their dangling labels turns permanent ERC noise into a clean signal for
-the pins that remain.
+their labels, connecting wire stubs, and marking the now-bare J1 pins
+no-connect turns permanent ERC noise into a clean signal for the pins
+that remain.
 
 Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>
 EOF
