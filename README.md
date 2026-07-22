@@ -53,8 +53,16 @@ between J1 and the two DB9 connectors (48mm wide, ~14mm tall). The source
 SVG is entirely axis-aligned `<rect>` elements (pixel-art style), so it was
 converted directly to 153 filled `gr_rect` silkscreen shapes at 1:1 fidelity
 rather than traced/vectorized. "Rev A" was moved down slightly to stay clear
-of the logo. No DRC/ERC change from this (silkscreen doesn't need clearance
-from the copper traces it sits over).
+of the logo, and "Controller HAT" was added back alongside it on the same
+line. No DRC/ERC change from this (silkscreen doesn't need clearance from
+the copper traces it sits over).
+
+**2026-07-22 (yet later):** added this repo's URL and a build date to the
+board's *back* silkscreen (`B.Silkscreen`) — the front was already full
+with the logo, title, and port labels. Back-layer text needs its "mirrored"
+flag set so it reads correctly once the board is physically flipped over;
+easy to miss when adding text via `pcbnew` scripting (the GUI does this
+automatically, scripting does not).
 
 ## Files
 

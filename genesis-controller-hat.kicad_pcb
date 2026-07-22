@@ -3910,6 +3910,28 @@
 			)
 		)
 	)
+	(gr_text "github.com/mjaydedecker/Bare-Metal-Sega-Genesis-Hat"
+		(at 132.5 60 0)
+		(layer "B.SilkS")
+		(uuid "46760a46-3a64-4bb6-8a5c-e6c3243ad53f")
+		(effects
+			(font
+				(size 1 1)
+			)
+			(justify mirror)
+		)
+	)
+	(gr_text "Jul 2026"
+		(at 132.5 65 0)
+		(layer "B.SilkS")
+		(uuid "82afcd29-66ec-4c32-b5f0-fba0900e9f03")
+		(effects
+			(font
+				(size 1.5 1.5)
+			)
+			(justify mirror)
+		)
+	)
 	(segment
 		(start 155 89.46)
 		(end 155 80)
