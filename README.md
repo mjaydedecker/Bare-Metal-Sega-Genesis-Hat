@@ -108,32 +108,34 @@ three), sourcing a DSUB with a narrower bracket, or accepting a 3-point-
 mounted HAT. This wasn't a factor with the previous vertical-mount
 footprint, which had a much smaller footprint envelope.
 
-## Known limitation: two residual track crossings near J1
+## Known limitation: one residual track crossing near J1
 
 `kicad-cli pcb drc --severity-all` on `genesis-controller-hat.kicad_pcb`
-reports 6 errors / 5 warnings, not zero — down from 30 errors / 6 warnings
-before the 2026-07-22 pin reassignment, and down from 17/5 earlier the same
-day. The pin reassignment eliminated same-layer trace crossings between
-J2/J3's own routing (`tracks_crossing`, `hole_clearance`, and
-`copper_edge_clearance` are all **zero**), and a follow-up pass eliminated
-the `shorting_items` (was 7) and `solder_mask_bridge` (was 6) violations
-those breakout tracks caused near J1: each affected track (`/GPIO24`,
-`/GPIO23`, `/GPIO7/SPI0.CE1`, `GND`, `/GPIO16`, `/GPIO12/PWM0`) now jogs
-around J1's row-A pins instead of skimming past them — J1's two pin rows
-are only 2.54mm apart, so a track targeting a row-B pin has to actively
-route around the row-A pin directly in front of it, not just aim at the
-target.
+reports 5 errors / 5 warnings, not zero — down from 30 errors / 6 warnings
+before the 2026-07-22 pin reassignment. The pin reassignment eliminated
+same-layer trace crossings between J2/J3's own routing (`tracks_crossing`,
+`hole_clearance`, and `copper_edge_clearance` are all **zero** from that
+pass), and a follow-up pass eliminated the `shorting_items` (was 7) and
+`solder_mask_bridge` (was 6) violations those breakout tracks caused near
+J1: each affected track (`/GPIO24`, `/GPIO23`, `/GPIO7/SPI0.CE1`, `GND`,
+`/GPIO16`, `/GPIO12/PWM0`) now jogs around J1's row-A pins instead of
+skimming past them — J1's two pin rows are only 2.54mm apart, so a track
+targeting a row-B pin has to actively route around the row-A pin directly
+in front of it, not just aim at the target.
 
-That fix left 2 `tracks_crossing` errors in the same crowded region:
-`/GPIO12/PWM0` vs `GND`, and `/GPIO24` vs either `/GPIO10/SPI0.MOSI` or
-`+3V3` depending on layer choice. These three-plus nets (`/GPIO12/PWM0`,
-`/GPIO6`, `GND` in one cluster; `/GPIO24`, `/GPIO10/SPI0.MOSI`, `+3V3` in
-another) form a mutually-conflicting set that can't all be pairwise
-separated with only 2 copper layers — a genuine topological limit, not a
-missed layer assignment. Resolving it fully needs either a via (layer
-change mid-track) on one of the conflicting nets, or manual interactive
-routing in the KiCad GUI; scripted jogs alone couldn't clear it without
-shuffling the same conflict to a different pair.
+That fix initially left 2 `tracks_crossing` errors in the same crowded
+region: `/GPIO12/PWM0` vs `GND`, and `/GPIO24` vs `/GPIO10/SPI0.MOSI`/`+3V3`.
+The `/GPIO12/PWM0`-vs-`GND` crossing is now resolved: `/GPIO6` was rerouted
+further left (clearing space around x=147.74), which let `/GPIO12/PWM0`
+approach its target pin (J1 pin 32) from the opposite side, on `F.Cu`,
+parallel to `/GPIO6` instead of crossing `GND` on `B.Cu`.
+
+One crossing remains: `/GPIO24` vs `/GPIO10/SPI0.MOSI`/`+3V3`. These nets
+form a mutually-conflicting cluster that can't all be pairwise separated
+with only 2 copper layers — a genuine topological limit, not a missed
+layer assignment. Resolving it needs either a via (layer change mid-track)
+on one of the conflicting nets, or manual interactive routing in the KiCad
+GUI.
 
 Remaining violations, none of them new:
 
@@ -152,10 +154,9 @@ Remaining violations, none of them new:
   not a copper/electrical issue.
 
 **Before fabricating this board, open it in the KiCad PCB editor and add a
-via to break the `/GPIO12/PWM0`-vs-`GND` and `/GPIO24`-vs-other-net
-crossings**, and clean up the silkscreen clips noted above, until DRC is
-fully clean apart from the pre-existing baseline items and the corner-hole
-trade-off above.
+via to break the `/GPIO24`-vs-other-net crossing**, and clean up the
+silkscreen clips noted above, until DRC is fully clean apart from the
+pre-existing baseline items and the corner-hole trade-off above.
 
 ## Verifying the board
 
@@ -166,8 +167,8 @@ python3 scripts/check_pinmap.py ../Bare-Metal-Sega-Genesis/src/input/sega_board.
 ```
 
 ERC should report 0 errors / 2 warnings (the `lib_symbol_mismatch` cache-drift
-warnings noted above). DRC will report 6 errors/5 warnings — see "Known
-limitation: two residual track crossings near J1" above for
+warnings noted above). DRC will report 5 errors/5 warnings — see "Known
+limitation: one residual track crossing near J1" above for
 the exact breakdown and why this isn't a bug to fix here; the schematic
 (electrical topology) is fully verified, the PCB's routing needs one more
 manual pass in the KiCad GUI before this board goes to fab. `check_pinmap.py`
