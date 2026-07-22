@@ -1,4 +1,6 @@
 .superpowers/
+.claude/
+.history/
 
 # KiCad
 *-backups/

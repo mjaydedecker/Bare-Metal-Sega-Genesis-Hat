@@ -17,6 +17,13 @@ full design rationale (why no ID EEPROM, no protection circuitry, no
 stacking header) and `docs/superpowers/plans/2026-07-21-controller-hat-v1.md`
 for how it was built.
 
+**2026-07-22:** the GPIO pin assignment was reassigned (see
+`docs/reviews/2026-07-22-pinmap-reassignment.md`) to eliminate PCB routing
+crossings, and a GND ground plane pour was added on `B.Cu`. A GitHub Actions
+workflow (`.github/workflows/verify-pinmap.yml`) now checks on every push
+that this board's schematic wiring matches the firmware repo's
+`sega_board.h` exactly.
+
 ## Files
 
 - `genesis-controller-hat.kicad_pro` / `.kicad_sch` / `.kicad_pcb` — the
@@ -39,38 +46,44 @@ the KiCad GUI once and run Tools → Update PCB from Schematic.
 ## Known limitation: J2/J3 routing needs manual cleanup before fabrication
 
 `kicad-cli pcb drc --severity-all` on `genesis-controller-hat.kicad_pcb`
-reports 32 errors / 6 warnings, not zero. 10 of those (9 `unconnected_items`
-+ 1 `lib_footprint_mismatch`) are pre-existing in KiCad's own template since
-before this HAT project touched it, and are unrelated to J2/J3. The
-remaining 28 (2 `copper_edge_clearance`, 3 `shorting_items`, 5
-`silk_edge_clearance`, 6 `solder_mask_bridge`, 12 `tracks_crossing` — the
-exact split between `shorting_items` and `tracks_crossing` varies slightly
-run to run; their combined count does not) come from routing J2/J3's 9 pins
-each to their scattered, fixed target pins on J1 (the pin assignment is
-fixed by `src/input/sega_board.h` — there's no freedom to reorder it for
-easier routing). Each connector's 9 pins are packed into a 2.77-2.84mm-pitch
-cluster and fan out to targets 40-50mm away; a scripted greedy two-layer
-router (see `scripts/task6_pcb_layout.py`) gets close but can't fully match
-what KiCad's interactive push-and-shove router or a real autorouter would
-achieve. One of the `silk_edge_clearance` warnings is the "Player 2" text
-label itself clipping the board's right edge (its anchor at `(161,74)` sits
-close enough to the edge for the rendered text width to overlap
-`Edge.Cuts`) — cosmetic, but worth nudging left during the same manual
-cleanup pass. **Before fabricating this board, open it in the KiCad PCB
-editor and manually clean up the flagged nets** (reroute with vias/jogs as
-needed) and the "Player 2" label position, until DRC is fully clean apart
-from the two pre-existing baseline items above.
+reports 16 errors / 6 warnings, not zero — down from 30 errors / 6 warnings
+before the 2026-07-22 pin reassignment. That reassignment's whole purpose
+was eliminating same-layer trace crossings between J2/J3's routing, and it
+worked: `tracks_crossing` and `hole_clearance` are both now **zero** (were
+14 and 4). The remaining violations are all pre-existing categories, not new
+ones:
+
+- `unconnected_items` (2), `lib_footprint_mismatch` (1) — pre-existing in
+  KiCad's own template since before this HAT project touched it (J1's +5V
+  pins 2/4 are simply unused, and J1's two +3.3V pins, 1 and 17, aren't
+  tied together on this board because they're already tied together
+  upstream on the Pi itself). Unrelated to J2/J3.
+- `copper_edge_clearance` (2), `silk_edge_clearance` (5),
+  `solder_mask_bridge` (6) — unchanged from before the reassignment.
+- `shorting_items` (6, up from 2) — the trade-off of the reassignment: with
+  zero same-layer crossings, the diagonal breakout tracks now graze a few
+  unrelated J1 pads along their path instead. This is a smaller and more
+  tractable problem than the crossings it replaced (each is a single
+  trace's midpoint needing a small manual jog in the KiCad GUI, not a
+  fundamental routing conflict).
+
+**Before fabricating this board, open it in the KiCad PCB editor and
+manually clean up the flagged nets** (reroute with vias/jogs as needed) and
+the "Player 2" label position (one of the `silk_edge_clearance` warnings),
+until DRC is fully clean apart from the pre-existing baseline items above.
 
 ## Verifying the board
 
 ```bash
 kicad-cli sch erc --severity-all genesis-controller-hat.kicad_sch
 kicad-cli pcb drc --severity-all genesis-controller-hat.kicad_pcb
+python3 scripts/check_pinmap.py ../Bare-Metal-Sega-Genesis/src/input/sega_board.h
 ```
 
-ERC should report 0 errors/0 warnings. DRC will report 32 errors/6 warnings
+ERC should report 0 errors/0 warnings. DRC will report 16 errors/6 warnings
 — see "Known limitation: J2/J3 routing needs manual cleanup before
 fabrication" above for the exact breakdown and why this isn't a bug to fix
 here; the schematic (electrical topology) is fully verified, the PCB's
 routing needs one more manual pass in the KiCad GUI before this board goes
-to fab.
+to fab. `check_pinmap.py` (also run in CI on every push) confirms the
+schematic's actual wiring matches the firmware repo's `sega_board.h`.

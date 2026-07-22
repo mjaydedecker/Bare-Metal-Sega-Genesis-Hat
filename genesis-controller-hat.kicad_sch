@@ -3061,17 +3061,6 @@
 	)
 	(wire
 		(pts
-			(xy 73.66 55.88)
-			(xy 100.33 55.88)
-		)
-		(stroke
-			(width 0)
-			(type solid)
-		)
-		(uuid "3522f983-faf4-44f4-900c-086a3d364c60")
-	)
-	(wire
-		(pts
 			(xy 31.75 63.5)
 			(xy 60.96 63.5)
 		)
@@ -3116,6 +3105,17 @@
 	)
 	(wire
 		(pts
+			(xy 31.75 43.18)
+			(xy 60.96 43.18)
+		)
+		(stroke
+			(width 0)
+			(type solid)
+		)
+		(uuid "55d9c53c-6409-4360-8797-b4f7b28c4137")
+	)
+	(wire
+		(pts
 			(xy 55.88 24.13)
 			(xy 55.88 27.94)
 		)
@@ -3135,17 +3135,6 @@
 			(type solid)
 		)
 		(uuid "62f43b49-7566-4f4c-b16f-9b95531f6d28")
-	)
-	(wire
-		(pts
-			(xy 31.75 55.88)
-			(xy 60.96 55.88)
-		)
-		(stroke
-			(width 0)
-			(type solid)
-		)
-		(uuid "6c897b01-6835-4bf3-885d-4b22704f8f6e")
 	)
 	(wire
 		(pts
@@ -3226,6 +3215,17 @@
 	)
 	(wire
 		(pts
+			(xy 73.66 48.26)
+			(xy 100.33 48.26)
+		)
+		(stroke
+			(width 0)
+			(type solid)
+		)
+		(uuid "8b129051-97ca-49cd-adf8-4efb5043fabb")
+	)
+	(wire
+		(pts
 			(xy 31.75 45.72)
 			(xy 60.96 45.72)
 		)
@@ -3234,17 +3234,6 @@
 			(type solid)
 		)
 		(uuid "9705171e-2fe8-4d02-a114-94335e138862")
-	)
-	(wire
-		(pts
-			(xy 31.75 53.34)
-			(xy 60.96 53.34)
-		)
-		(stroke
-			(width 0)
-			(type solid)
-		)
-		(uuid "98a1aa7c-68bd-4966-834d-f673bb2b8d39")
 	)
 	(wire
 		(pts
@@ -3311,6 +3300,17 @@
 			(type solid)
 		)
 		(uuid "c15b519d-5e2e-489c-91b6-d8ff3e8343cb")
+	)
+	(wire
+		(pts
+			(xy 31.75 73.66)
+			(xy 60.96 73.66)
+		)
+		(stroke
+			(width 0)
+			(type solid)
+		)
+		(uuid "c373340b-844b-44cd-869b-a1267d366977")
 	)
 	(wire
 		(pts
@@ -3397,16 +3397,6 @@
 		)
 		(uuid "35a1cc8d-cefe-4fd3-8f7e-ebdbdbd072ee")
 	)
-	(label "GPIO9{slash}SPI0.MISO"
-		(at 31.75 53.34 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "3911220d-b117-4874-8479-50c0285caa70")
-	)
 	(label "GPIO23"
 		(at 100.33 45.72 180)
 		(effects
@@ -3427,15 +3417,25 @@
 		)
 		(uuid "5069ddbc-357e-4355-aaa5-a8f551963b7a")
 	)
-	(label "GPIO8{slash}SPI0.CE0"
-		(at 100.33 55.88 180)
+	(label "GPIO27"
+		(at 31.75 43.18 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify right bottom)
+			(justify left bottom)
 		)
-		(uuid "64ee07d4-0247-486c-a5b0-d3d33362f168")
+		(uuid "591fa762-d154-4cf7-8db7-a10b610ff12a")
+	)
+	(label "GPIO26"
+		(at 31.75 73.66 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "5f2ee32f-d6d5-4b76-8935-0d57826ec36e")
 	)
 	(label "GPIO16"
 		(at 100.33 71.12 180)
@@ -3487,6 +3487,16 @@
 		)
 		(uuid "b2ab078a-8774-4d1b-9381-5fcf23cc6a42")
 	)
+	(label "GPIO24"
+		(at 100.33 48.26 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "b8e48041-ff05-4814-a4a3-fb04f84542aa")
+	)
 	(label "GPIO7{slash}SPI0.CE1"
 		(at 100.33 58.42 180)
 		(effects
@@ -3496,16 +3506,6 @@
 			(justify right bottom)
 		)
 		(uuid "be4b9f73-f8d2-4c28-9237-5d7e964636fa")
-	)
-	(label "GPIO11{slash}SPI0.SCLK"
-		(at 31.75 55.88 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "f9b80c2b-5447-4c6b-b35d-cb6b75fa7978")
 	)
 	(symbol
 		(lib_id "power:+3.3V")
@@ -4001,51 +4001,51 @@
 	)
 	(no_connect
 		(at 60.96 30.48)
-		(uuid "6edd8c18-5f09-4f9f-b6ae-9e2757962d34")
+		(uuid "d65c0861-e2f4-42de-be0f-4e7a443470dc")
 	)
 	(no_connect
 		(at 60.96 33.02)
-		(uuid "411414d7-1cae-4fff-b524-2a529b4e1263")
+		(uuid "694d237a-9183-4b6a-abd6-5c81bb15b2a5")
+	)
+	(no_connect
+		(at 73.66 55.88)
+		(uuid "cc042906-5788-48fc-aa3f-efc095e8ce5c")
+	)
+	(no_connect
+		(at 60.96 53.34)
+		(uuid "f98f7ba7-8f7c-462e-bb11-d7efbc8b7277")
+	)
+	(no_connect
+		(at 60.96 55.88)
+		(uuid "af41ac84-c2f8-4206-9486-c4f123644b97")
 	)
 	(no_connect
 		(at 73.66 35.56)
-		(uuid "0f8d0019-ca6d-484b-8cea-666c2afe94d4")
+		(uuid "0e26c244-36eb-4b1d-aac0-e686058f3b17")
 	)
 	(no_connect
 		(at 73.66 38.1)
-		(uuid "395fb4f0-f468-432c-a256-2f46ef74be67")
+		(uuid "28ed4b7a-f399-4025-a4a8-187448714c7e")
 	)
 	(no_connect
 		(at 73.66 40.64)
-		(uuid "288276c4-dbb8-48c0-9bc0-54ba764ce3e7")
-	)
-	(no_connect
-		(at 73.66 48.26)
-		(uuid "1af5606b-8d49-4942-8baf-cfba9bc8abf5")
-	)
-	(no_connect
-		(at 60.96 43.18)
-		(uuid "f4dc892b-4696-45d4-913e-23a69a3675b5")
-	)
-	(no_connect
-		(at 73.66 53.34)
-		(uuid "6d249bf3-94e8-498c-bae7-b44ceeea4e33")
+		(uuid "74d5f83d-483a-4ff4-b157-f5b835893d10")
 	)
 	(no_connect
 		(at 60.96 71.12)
-		(uuid "1c1b3ebd-497b-467a-947d-be2ca07f66d9")
+		(uuid "96e391a7-8c82-4811-97ab-b8aa669215f1")
 	)
 	(no_connect
 		(at 73.66 73.66)
-		(uuid "ab637f2a-2172-4c25-af79-9026d1629e4f")
-	)
-	(no_connect
-		(at 60.96 73.66)
-		(uuid "48bd1812-d5e4-410c-96d5-983ee851a51d")
+		(uuid "63e89b4c-77df-4cfb-b57c-7e2f95e65b0d")
 	)
 	(no_connect
 		(at 73.66 76.2)
-		(uuid "79a2726e-235e-4d07-bf77-255446205611")
+		(uuid "ec877597-a299-4c94-b9b5-6933d1428d93")
+	)
+	(no_connect
+		(at 73.66 53.34)
+		(uuid "31b46b58-d187-40f0-9438-9df8be0d3e78")
 	)
 	(symbol
 		(lib_id "Connector:DE9_Socket_MountingHoles")
@@ -4055,7 +4055,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "c0c91294-0c08-4002-9353-ee867b38d0cb")
+		(uuid "7bf1f54e-9669-4d27-b284-75c2cd539c31")
 		(property "Reference" "J2"
 			(at 50.8 236.22 0)
 			(effects
@@ -4099,188 +4099,6 @@
 			)
 		)
 	)
-	(label "GPIO5"
-		(at 43.18 243.84 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "3a84665f-8faf-4b03-8464-d10a3acf7e40")
-	)
-	(label "GPIO6"
-		(at 43.18 248.92 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "0be1fc55-108b-4223-bb0c-5975852d14ab")
-	)
-	(label "GPIO7{slash}SPI0.CE1"
-		(at 43.18 254.0 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "6116f2ab-dc11-4207-8104-14c219a6bf30")
-	)
-	(label "GPIO8{slash}SPI0.CE0"
-		(at 43.18 259.08 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "2dec81b7-6936-462e-a86e-5459327de1da")
-	)
-	(label "GPIO9{slash}SPI0.MISO"
-		(at 43.18 246.38 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "25aa8236-6831-4cbb-aac3-d5e988cb5ab8")
-	)
-	(label "GPIO4{slash}GPCLK0"
-		(at 43.18 251.46 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "7f0eb5e1-6ca2-4322-ba7a-8fe0eb6eb751")
-	)
-	(label "GPIO10{slash}SPI0.MOSI"
-		(at 43.18 261.62 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "1d9eb3c4-f6e0-4b79-bacb-f2de0767499b")
-	)
-	(symbol
-		(lib_id "power:+3.3V")
-		(at 43.18 264.16 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "7b1bdf04-949e-4051-86e2-57bb21a48d6f")
-		(property "Reference" "#PWR901"
-			(at 43.18 267.97 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+3V3"
-			(at 43.18 259.84000000000003 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 43.18 264.16 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 43.18 264.16 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "3ab249cf-3f4c-45fc-9a0b-b71d45f3b478")
-		)
-		(instances
-			(project "RaspberryPi-HAT"
-				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
-					(reference "#PWR901")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 43.18 256.54 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "cff81a62-f927-4ae6-8ab8-45d436d0e04e")
-		(property "Reference" "#PWR902"
-			(at 43.18 260.35 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 43.18 252.22000000000003 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 43.18 256.54 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 43.18 256.54 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "19a6c5f7-4558-4ebd-b1b8-efe76a0184db")
-		)
-		(instances
-			(project "RaspberryPi-HAT"
-				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
-					(reference "#PWR902")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(no_connect
-		(at 50.8 269.24)
-		(uuid "c9003d32-de62-4ddf-b26d-bd69e867c0fe")
-	)
 	(symbol
 		(lib_id "Connector:DE9_Socket_MountingHoles")
 		(at 101.6 254.0 0)
@@ -4289,7 +4107,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "a86e28a5-80ef-452b-83f7-dd11d3ad9332")
+		(uuid "063c2d23-d93a-4eaf-adb9-ddca2ec747f5")
 		(property "Reference" "J3"
 			(at 101.6 236.22 0)
 			(effects
@@ -4333,7 +4151,87 @@
 			)
 		)
 	)
+	(label "GPIO22"
+		(at 43.18 251.46 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "1e959b83-015b-4aaf-bbb2-1da64fbf65ef")
+	)
+	(label "GPIO10{slash}SPI0.MOSI"
+		(at 43.18 243.84 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "23ef332c-70a7-400a-a579-a80c6452ea04")
+	)
+	(label "GPIO23"
+		(at 43.18 248.92 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "bfbf1b85-d32b-4adc-bf17-08b9e499c1f6")
+	)
+	(label "GPIO27"
+		(at 43.18 254.0 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "8dc4c580-c837-4b36-9858-445865818b17")
+	)
+	(label "GPIO17"
+		(at 43.18 259.08 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "5a260411-7dc9-459a-9603-229ede991a5c")
+	)
+	(label "GPIO24"
+		(at 43.18 246.38 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "e3b8ada7-ffdb-4383-b08c-cda9d17badf8")
+	)
+	(label "GPIO4{slash}GPCLK0"
+		(at 43.18 261.62 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "5f311a1a-7bff-4028-a396-a8c61c245d6e")
+	)
 	(label "GPIO12{slash}PWM0"
+		(at 93.98 251.46 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "a5bfbb51-f15e-41ab-976e-f60d7bb5f504")
+	)
+	(label "GPIO26"
 		(at 93.98 243.84 180)
 		(effects
 			(font
@@ -4341,7 +4239,7 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "2dc61c82-dbaf-4c7c-af5d-92fed72357fb")
+		(uuid "519b6abe-6da7-4d61-82f5-dd19649dffa2")
 	)
 	(label "GPIO13{slash}PWM1"
 		(at 93.98 248.92 180)
@@ -4351,9 +4249,9 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "09991245-39dc-456e-bbc7-6495a0eac372")
+		(uuid "6db4c7e6-02cc-406d-8f44-66c818e69f7e")
 	)
-	(label "GPIO16"
+	(label "GPIO6"
 		(at 93.98 254.0 180)
 		(effects
 			(font
@@ -4361,9 +4259,9 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "0354730e-c969-49c1-8c5f-8ce9d9668fb8")
+		(uuid "a8f8d6d3-97a4-49d3-98a4-6aa1c0815709")
 	)
-	(label "GPIO17"
+	(label "GPIO5"
 		(at 93.98 259.08 180)
 		(effects
 			(font
@@ -4371,9 +4269,9 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "6d4f37a9-fc57-447e-b81a-708c302e62a7")
+		(uuid "51001588-e3da-4241-ae63-46eb5e09f66f")
 	)
-	(label "GPIO22"
+	(label "GPIO16"
 		(at 93.98 246.38 180)
 		(effects
 			(font
@@ -4381,19 +4279,9 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "e3a410f8-5539-4f60-9c31-b6c6bce41a7c")
+		(uuid "8dcd5317-cc6c-4e0a-97e2-1393590bcb29")
 	)
-	(label "GPIO11{slash}SPI0.SCLK"
-		(at 93.98 251.46 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "3e8d3f3f-6abb-48e3-a0a0-bdeb1665eae7")
-	)
-	(label "GPIO23"
+	(label "GPIO7{slash}SPI0.CE1"
 		(at 93.98 261.62 180)
 		(effects
 			(font
@@ -4401,7 +4289,119 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "a90c3ae0-8cdf-4406-95e8-73c6af44f74e")
+		(uuid "8a4238f8-8a28-42c4-82df-1a573b1b8f56")
+	)
+	(symbol
+		(lib_id "power:+3.3V")
+		(at 43.18 264.16 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "877a38cd-646d-4597-b7c3-d3daf58c7d82")
+		(property "Reference" "#PWR901"
+			(at 43.18 267.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+3V3"
+			(at 43.18 259.84000000000003 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 43.18 264.16 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 43.18 264.16 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "801b6fc1-9c99-4c53-ac62-e6f2483ddb16")
+		)
+		(instances
+			(project "RaspberryPi-HAT"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
+					(reference "#PWR901")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 43.18 256.54 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "c59a9f03-d983-41de-9219-4c83a9aa7497")
+		(property "Reference" "#PWR902"
+			(at 43.18 260.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 43.18 252.22000000000003 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 43.18 256.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 43.18 256.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "3ce35d89-2fe3-4161-aab2-f97ed142424b")
+		)
+		(instances
+			(project "RaspberryPi-HAT"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
+					(reference "#PWR902")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(no_connect
+		(at 50.8 269.24)
+		(uuid "ce6b69c4-912b-4595-82b2-9d6fad59a34b")
 	)
 	(symbol
 		(lib_id "power:+3.3V")
@@ -4411,7 +4411,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "3e981ed6-f866-4b76-b35b-910cb9c746eb")
+		(uuid "32250312-6fd1-4336-824c-1fcf9b4cb1d1")
 		(property "Reference" "#PWR903"
 			(at 93.98 267.97 0)
 			(effects
@@ -4446,7 +4446,7 @@
 			)
 		)
 		(pin "1"
-			(uuid "bedd9f3a-d871-4c88-89a7-74d865e1af95")
+			(uuid "f5b72b00-c448-487e-bb19-9ec3b140bfcd")
 		)
 		(instances
 			(project "RaspberryPi-HAT"
@@ -4465,7 +4465,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "f0bd6666-f5da-430b-b79b-af4df98699da")
+		(uuid "8cff3e55-2db3-48f7-be9c-4a8c2de25f33")
 		(property "Reference" "#PWR904"
 			(at 93.98 260.35 0)
 			(effects
@@ -4500,7 +4500,7 @@
 			)
 		)
 		(pin "1"
-			(uuid "f3e9ec80-f1f7-4931-8779-a5581355e98c")
+			(uuid "9401e845-98ec-47df-9296-bc9b90c2b1ed")
 		)
 		(instances
 			(project "RaspberryPi-HAT"
@@ -4513,6 +4513,6 @@
 	)
 	(no_connect
 		(at 101.6 269.24)
-		(uuid "0376c6d2-6e05-4da1-9226-835aee8343bc")
+		(uuid "70326264-9201-4910-951e-e482df512c9a")
 	)
 )

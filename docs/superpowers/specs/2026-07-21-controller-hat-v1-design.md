@@ -52,19 +52,28 @@ design's only job is to match that contract exactly.
 
 ## Pin map (authoritative source: firmware repo's `sega_board.h`)
 
+**Updated 2026-07-22:** reassigned from the original table below (Port 1 =
+GPIO4/5/6/7/8/9/10, Port 2 = GPIO11/12/13/16/17/22/23) to eliminate PCB
+routing crossings — the original assignment interleaved each port's 7
+signals across non-adjacent GPIO header columns. The new assignment groups
+each port's signals onto physically adjacent header columns, nearest that
+port's DB9 connector, which lets this board route both ports with zero
+same-layer trace crossings. See `docs/reviews/2026-07-22-pinmap-reassignment.md`
+for the full analysis.
+
 BCM numbering, Pi 40-pin header:
 
 | DB9 pin | Signal              | Port 1 (J2) | Port 2 (J3) |
 |---------|---------------------|-------------|-------------|
-| 1       | Up                  | GPIO5       | GPIO12      |
-| 2       | Down                | GPIO6       | GPIO13      |
-| 3       | Left                | GPIO7       | GPIO16      |
-| 4       | Right               | GPIO8       | GPIO17      |
+| 1       | Up                  | GPIO10      | GPIO26      |
+| 2       | Down                | GPIO23      | GPIO13      |
+| 3       | Left                | GPIO27      | GPIO6       |
+| 4       | Right               | GPIO17      | GPIO5       |
 | 5       | +3.3V (NOT 5V)      | Pi 3.3V rail| Pi 3.3V rail|
-| 6       | TL (B / A)          | GPIO9       | GPIO22      |
-| 7       | SELECT (output)     | GPIO4       | GPIO11      |
+| 6       | TL (B / A)          | GPIO24      | GPIO16      |
+| 7       | SELECT (output)     | GPIO22      | GPIO12      |
 | 8       | GND                 | GND         | GND         |
-| 9       | TR (C / Start)      | GPIO10      | GPIO23      |
+| 9       | TR (C / Start)      | GPIO4       | GPIO7       |
 
 **Do not connect / leave unpopulated:**
 - GPIO0/1 — reserved for HAT ID EEPROM by the firmware doc; unused here since
@@ -72,8 +81,8 @@ BCM numbering, Pi 40-pin header:
 - GPIO2/3 — reserved for a deferred I2C-config DAC on the firmware side.
 - GPIO14/15 — UART (Circle serial init).
 - GPIO18-21 — I2S DAC (PCM_CLK/FS/DIN/DOUT), live `audio_output=i2s` option.
-- GPIO24-27 — left spare by the firmware doc for possible future use (status
-  LED, multitap); not populated in this v1 board.
+- GPIO8/9/11/25 — left spare by the firmware doc for possible future use
+  (status LED, multitap); not populated in this v1 board.
 
 If this table and `src/input/sega_board.h` in the firmware repo ever disagree,
 the firmware repo's `BoardPinMap` is authoritative — this board must be updated
