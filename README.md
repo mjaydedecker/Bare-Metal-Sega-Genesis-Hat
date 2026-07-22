@@ -31,6 +31,15 @@ left respectively so all 4 of their mounting holes sit fully on the board
 board edge) — each hole now has about 1mm of clearance to the edge, with
 about 2mm of clearance between the two connector shells.
 
+**Also 2026-07-22:** J2/J3 were switched from KiCad's `DSUB-9_Socket_Vertical`
+footprint to `DSUB-9_Socket_Horizontal_..._EdgePinOffset7.70mm_Housed_MountingHolesOffset9.12mm`
+— the vertical footprint has its DB9 opening facing straight up (a cable
+plugs in from directly above the HAT), not out over the board edge. The
+edge-mount/right-angle footprint hangs the connector's shell 9.12mm past the
+board's bottom edge so a controller cable plugs in horizontally, console-
+style. See "Known limitation: edge-mount connectors overlap the corner
+mounting holes" below for a real trade-off this introduced.
+
 ## Files
 
 - `genesis-controller-hat.kicad_pro` / `.kicad_sch` / `.kicad_pcb` — the
@@ -50,38 +59,60 @@ command in this KiCad install — if you need full parity (e.g. before
 opening this in the GUI to do further layout work), open the project in
 the KiCad GUI once and run Tools → Update PCB from Schematic.
 
+## Known limitation: edge-mount connectors overlap the corner mounting holes
+
+J2/J3's edge-mount footprint has a 30.85mm-wide plastic mounting base (the
+flat bracket that carries the connector's own two screws). The board's
+official corner mounting holes are only 58mm apart. The math doesn't work
+out: positioning each connector far enough from its nearest corner hole to
+fully clear it pushes the two connectors' bases into each other in the
+middle — there is no position that clears both constraints on this board
+width. Clearing J2/J3 from each other (the more important constraint, since
+overlapping *each other* would mean the parts can't be populated at all) was
+prioritized, which leaves each connector's base overlapping its nearest
+corner hole's clearance (`courtyards_overlap`, 2 errors — J2 vs `MH3`, J3 vs
+`MH4`, both bottom corners).
+
+This is a genuine mechanical conflict, not a cosmetic DRC nag: the DSUB
+bracket's plastic physically occupies where that corner's mounting screw
+would go. **Before fabricating, decide how to resolve it** — options include
+omitting that corner's mounting screw (the HAT would be held by the other
+three), sourcing a DSUB with a narrower bracket, or accepting a 3-point-
+mounted HAT. This wasn't a factor with the previous vertical-mount
+footprint, which had a much smaller footprint envelope.
+
 ## Known limitation: J2/J3 routing needs manual cleanup before fabrication
 
 `kicad-cli pcb drc --severity-all` on `genesis-controller-hat.kicad_pcb`
-reports 15 errors / 7 warnings, not zero — down from 30 errors / 6 warnings
+reports 17 errors / 5 warnings, not zero — down from 30 errors / 6 warnings
 before the 2026-07-22 pin reassignment. That reassignment's whole purpose
 was eliminating same-layer trace crossings between J2/J3's routing, and it
 worked: `tracks_crossing`, `hole_clearance`, and `copper_edge_clearance` are
 all now **zero** (were 14, 4, and 2). The remaining violations are all
-pre-existing or cosmetic categories, not functional regressions:
+pre-existing, cosmetic, or the documented mechanical trade-off above — not
+routing regressions:
 
+- `courtyards_overlap` (2) — the edge-mount connector/corner-hole conflict
+  documented above. Not a routing issue.
 - `unconnected_items` (2), `lib_footprint_mismatch` (1) — pre-existing in
   KiCad's own template since before this HAT project touched it (J1's +5V
   pins 2/4 are simply unused, and J1's two +3.3V pins, 1 and 17, aren't
   tied together on this board because they're already tied together
   upstream on the Pi itself). Unrelated to J2/J3.
 - `solder_mask_bridge` (6) — unchanged from before the reassignment.
-- `silk_edge_clearance` (6, up from 5) — moving J2/J3 to get all 4
-  mounting holes fully on-board (see above) pushed each connector's
-  silkscreen outline (drawn slightly larger than the copper pads) right up
-  against the board edge on its outer side. Cosmetic only — a silkscreen
-  clip at the board edge, not a copper/electrical issue.
-- `shorting_items` (7, up from 6) — the trade-off of the pin reassignment:
-  with zero same-layer crossings, the diagonal breakout tracks graze a few
-  unrelated J1 pads along their path instead. This is a smaller and more
-  tractable problem than the crossings it replaced (each is a single
-  trace's midpoint needing a small manual jog in the KiCad GUI, not a
-  fundamental routing conflict).
+- `silk_edge_clearance` (4) — cosmetic; a silkscreen clip at the board edge,
+  not a copper/electrical issue.
+- `shorting_items` (7, up from 6 pre-reassignment) — the trade-off of the
+  pin reassignment: with zero same-layer crossings, the diagonal breakout
+  tracks graze a few unrelated J1 pads along their path instead. This is a
+  smaller and more tractable problem than the crossings it replaced (each
+  is a single trace's midpoint needing a small manual jog in the KiCad
+  GUI, not a fundamental routing conflict).
 
 **Before fabricating this board, open it in the KiCad PCB editor and
 manually clean up the flagged nets** (reroute with vias/jogs as needed) and
 the silkscreen clips noted above, until DRC is fully clean apart from the
-pre-existing baseline items above.
+pre-existing baseline items and the corner-hole trade-off above.
 
 ## Verifying the board
 
@@ -91,7 +122,7 @@ kicad-cli pcb drc --severity-all genesis-controller-hat.kicad_pcb
 python3 scripts/check_pinmap.py ../Bare-Metal-Sega-Genesis/src/input/sega_board.h
 ```
 
-ERC should report 0 errors/0 warnings. DRC will report 15 errors/7 warnings
+ERC should report 0 errors/0 warnings. DRC will report 17 errors/5 warnings
 — see "Known limitation: J2/J3 routing needs manual cleanup before
 fabrication" above for the exact breakdown and why this isn't a bug to fix
 here; the schematic (electrical topology) is fully verified, the PCB's

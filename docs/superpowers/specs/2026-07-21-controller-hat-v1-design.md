@@ -42,11 +42,17 @@ design's only job is to match that contract exactly.
 
 - **J1** — 2×20 female header, standard 0.1" pitch, plain (non-stacking),
   positioned to mate with the Pi's 40-pin GPIO header.
-- **J2** — DB9 (DE-9) female socket, vertical panel-mount, Player 1.
-- **J3** — DB9 (DE-9) female socket, vertical panel-mount, Player 2.
-- J2 and J3 sit side-by-side along one edge of the board, opposite the GPIO
-  header side, overhanging the Pi's footprint so the sockets are reachable with
-  the HAT seated on the Pi.
+- **J2** — DB9 (DE-9) female socket, right-angle/edge-mount, Player 1.
+- **J3** — DB9 (DE-9) female socket, right-angle/edge-mount, Player 2.
+- J2 and J3 sit side-by-side along the board's bottom edge, opposite the GPIO
+  header side, with their shells overhanging the board edge (9.12mm) so
+  controller cables plug in horizontally at the board's edge, console-style.
+  **Updated 2026-07-22:** switched from a vertical-mount footprint (opening
+  faces straight up, cable plugs in from above) to this edge-mount one. The
+  edge-mount connector's wider mounting bracket doesn't fully clear the
+  board's corner mounting holes at this board width — see the HAT repo's
+  `README.md` "Known limitation: edge-mount connectors overlap the corner
+  mounting holes" for the accepted trade-off.
 - No other active or passive components (no resistors, diodes, LEDs, EEPROM,
   or fuses).
 
