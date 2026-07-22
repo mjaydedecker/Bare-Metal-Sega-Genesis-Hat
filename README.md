@@ -86,35 +86,39 @@ command in this KiCad install — if you need full parity (e.g. before
 opening this in the GUI to do further layout work), open the project in
 the KiCad GUI once and run Tools → Update PCB from Schematic.
 
-## Known limitation: edge-mount connectors overlap the corner mounting holes
+## Known limitation: only 2 of the 4 official corner mounting holes remain
 
 J2/J3's edge-mount footprint has a 30.85mm-wide plastic mounting base (the
 flat bracket that carries the connector's own two screws). The board's
-official corner mounting holes are only 58mm apart. The math doesn't work
-out: positioning each connector far enough from its nearest corner hole to
-fully clear it pushes the two connectors' bases into each other in the
-middle — there is no position that clears both constraints on this board
-width. Clearing J2/J3 from each other (the more important constraint, since
-overlapping *each other* would mean the parts can't be populated at all) was
-prioritized, which leaves each connector's base overlapping its nearest
-corner hole's clearance (`courtyards_overlap`, 2 errors — J2 vs `MH3`, J3 vs
-`MH4`, both bottom corners).
+official corner mounting holes are only 58mm apart, and the math didn't
+work out: positioning each connector far enough from its nearest corner
+hole to fully clear it pushed the two connectors' bases into each other in
+the middle. Clearing J2/J3 from each other (the more important constraint,
+since overlapping *each other* would mean the parts can't be populated at
+all) was prioritized, which left each connector's base overlapping its
+nearest corner hole — J2 over the bottom-left hole (`MH3`), J3 over the
+bottom-right hole (`MH4`). Both bottom corners were affected, not just one.
 
-This is a genuine mechanical conflict, not a cosmetic DRC nag: the DSUB
-bracket's plastic physically occupies where that corner's mounting screw
-would go. **Before fabricating, decide how to resolve it** — options include
-omitting that corner's mounting screw (the HAT would be held by the other
-three), sourcing a DSUB with a narrower bracket, or accepting a 3-point-
-mounted HAT. This wasn't a factor with the previous vertical-mount
-footprint, which had a much smaller footprint envelope.
+Since those two mounting screws could never actually be installed (the DSUB
+bracket's plastic physically occupies the space), **`MH3` and `MH4` were
+removed** rather than left in as dead weight — `courtyards_overlap` is now
+zero. This board mounts on only the 2 remaining corner holes (`MH1`/`MH2`,
+both at the top, next to the GPIO header) plus the GPIO header's own
+friction fit; it no longer meets the official HAT spec's 4-corner-hole
+requirement (this board was already not pursuing full HAT certification —
+see the design spec's "Scope decisions"). If 4-point mounting matters for
+your use case, the alternatives are the same as before: a DSUB with a
+narrower bracket, or reverting to the smaller vertical-mount footprint
+(mating face up, not edge-accessible).
 
 ## Routing is now fully clean of crossings and shorts
 
 `kicad-cli pcb drc --severity-all` on `genesis-controller-hat.kicad_pcb`
-reports 4 errors / 5 warnings, not zero — down from 30 errors / 6 warnings
+reports 2 errors / 5 warnings, not zero — down from 30 errors / 6 warnings
 before the 2026-07-22 pin reassignment. `tracks_crossing`, `shorting_items`,
-`solder_mask_bridge`, `hole_clearance`, and `copper_edge_clearance` are all
-now **zero**. Getting there took three passes:
+`solder_mask_bridge`, `hole_clearance`, `copper_edge_clearance`, and
+`courtyards_overlap` are all now **zero**. Getting the routing-related ones
+clean took three passes:
 
 1. The pin reassignment itself (see `docs/reviews/2026-07-22-pinmap-reassignment.md`)
    eliminated same-layer crossings between J2/J3's own routing, but left
@@ -138,8 +142,6 @@ now **zero**. Getting there took three passes:
 
 Remaining violations, all pre-existing or cosmetic:
 
-- `courtyards_overlap` (2) — the edge-mount connector/corner-hole conflict
-  documented above. Not a routing issue.
 - `unconnected_items` (2), `lib_footprint_mismatch` (1) — pre-existing in
   KiCad's own template since before this HAT project touched it (J1's +5V
   pins 2/4 are simply unused, and J1's two +3.3V pins, 1 and 17, aren't
@@ -165,7 +167,7 @@ python3 scripts/check_pinmap.py ../Bare-Metal-Sega-Genesis/src/input/sega_board.
 ```
 
 ERC should report 0 errors / 2 warnings (the `lib_symbol_mismatch` cache-drift
-warnings noted above). DRC will report 4 errors/5 warnings — see "Routing
+warnings noted above). DRC will report 2 errors/5 warnings — see "Routing
 is now fully clean of crossings and shorts" above for
 the exact breakdown and why this isn't a bug to fix here; the schematic
 (electrical topology) is fully verified, the PCB's routing needs one more

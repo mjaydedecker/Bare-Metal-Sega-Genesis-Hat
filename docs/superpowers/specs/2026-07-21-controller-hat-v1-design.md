@@ -21,9 +21,15 @@ design's only job is to match that contract exactly.
   and unconnected). This is a bare-metal kernel with no Linux/device-tree, so
   EEPROM auto-config has no consumer. GPIO0/1 are kept clear per the firmware
   doc's reservation, simply left unused rather than wired to an EEPROM.
-- **Board outline:** Standard full-size HAT footprint, 65×56.5mm, 4 mounting
-  holes matching the Pi 2/3/4B hole pattern (the firmware doc's `BoardPinMap`
-  comment targets "Pi 2, 40-pin header, BCM numbering").
+- **Board outline:** Standard full-size HAT footprint, 65×56.5mm. Originally
+  4 mounting holes matching the Pi 2/3/4B hole pattern (the firmware doc's
+  `BoardPinMap` comment targets "Pi 2, 40-pin header, BCM numbering");
+  **updated 2026-07-22:** the bottom two (`MH3`/`MH4`) were removed after
+  the edge-mount DB9 connectors' brackets made them physically unusable —
+  see "Components" below and the HAT repo's `README.md`. This board mounts
+  on the remaining 2 top corner holes plus the GPIO header's friction fit,
+  and no longer meets the official HAT spec's 4-hole requirement (already
+  not pursuing certification, per above).
 - **No electrical protection.** Data/SELECT lines wire straight from the DB9
   sockets to GPIO with no series resistors, no TVS/ESD diodes, no polyfuse on
   the 3.3V rail. This mirrors the firmware spec's documented contract exactly
@@ -49,10 +55,10 @@ design's only job is to match that contract exactly.
   controller cables plug in horizontally at the board's edge, console-style.
   **Updated 2026-07-22:** switched from a vertical-mount footprint (opening
   faces straight up, cable plugs in from above) to this edge-mount one. The
-  edge-mount connector's wider mounting bracket doesn't fully clear the
-  board's corner mounting holes at this board width — see the HAT repo's
-  `README.md` "Known limitation: edge-mount connectors overlap the corner
-  mounting holes" for the accepted trade-off.
+  edge-mount connector's wider mounting bracket didn't fully clear the
+  board's corner mounting holes at this board width, so the two affected
+  holes (`MH3`/`MH4`) were removed — see the HAT repo's `README.md` "Known
+  limitation: only 2 of the 4 official corner mounting holes remain".
 - No other active or passive components (no resistors, diodes, LEDs, EEPROM,
   or fuses).
 
