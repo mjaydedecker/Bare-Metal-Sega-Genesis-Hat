@@ -4,6 +4,13 @@ A passive Raspberry Pi HAT exposing two DB9 (DE-9) ports for original Sega
 Genesis / Mega Drive controllers, wired directly to the Pi's 40-pin GPIO
 header.
 
+<p align="center">
+  <img src="docs/images/board-top.png" alt="Board top render" width="49%">
+  <img src="docs/images/board-bottom.png" alt="Board bottom render" width="49%">
+</p>
+
+Licensed under [CERN-OHL-S v2](LICENSE) — see [License](#license) below.
+
 This board has no firmware of its own. The pin assignment and electrical
 contract it implements are owned by the firmware repo,
 [Bare-Metal-Sega-Genesis](../Bare-Metal-Sega-Genesis), specifically
@@ -135,14 +142,27 @@ narrower bracket, or reverting to the smaller vertical-mount footprint
 
 ## DRC and ERC status
 
+**2026-07-23:** the 4 remaining `tracks_crossing` errors on `+3V3`
+(described below as needing "a via or manual interactive routing") were
+fixed. They turned out to be real same-layer shorts, not just a DRC
+nitpick — and `kicad-cli`'s DRC was only surfacing 4 of the actual 8
+crossings on that net (confirmed by an exhaustive geometric check of every
+same-layer track pair). Both `+3V3` legs (J1→J2 pin 5, J1→J3 pin 5) were
+rerouted around the *outside* of the connector's own pin field instead of
+weaving between individual pins, entering pin 5 from clear space beyond
+the connector rather than crossing the other GPIO nets. `+3V3`'s segment
+count dropped from 87 to 13 in the process. `kicad-cli pcb drc
+--severity-all` now reports **0 errors / 0 warnings**.
+
 `kicad-cli pcb drc --severity-all` on `genesis-controller-hat.kicad_pcb`
-reports 4 errors / 0 warnings, not zero — down from 30 errors / 6 warnings
-before the first 2026-07-22 pin reassignment. `shorting_items`,
+reports 0 errors / 0 warnings — down from 30 errors / 6 warnings before
+the first 2026-07-22 pin reassignment. `shorting_items`,
 `solder_mask_bridge`, `hole_clearance`, `copper_edge_clearance`,
-`courtyards_overlap`, `silk_edge_clearance`, and `lib_footprint_mismatch`
-are all now **zero**. Getting there took several passes across two
-separate reassignments (first to fix routing crossings, second to correct
-the connector gender — see the log above):
+`courtyards_overlap`, `silk_edge_clearance`, `lib_footprint_mismatch`, and
+`tracks_crossing` are all now **zero**. Getting there took several passes
+across two separate reassignments (first to fix routing crossings, second
+to correct the connector gender — see the log above), then the `+3V3`
+reroute above:
 
 1. The first pin reassignment (see
    `docs/reviews/2026-07-22-pinmap-reassignment.md`) eliminated same-layer
@@ -163,20 +183,13 @@ the connector gender — see the log above):
 
 Remaining violations:
 
-- `unconnected_items` (1) — J1's two +3.3V pins (1 and 17) aren't tied
-  together on this board, because they're already tied together upstream
-  on the Pi itself. Pre-existing in KiCad's own template since before this
-  HAT project touched it; unrelated to J2/J3, cannot be "fixed" without
-  adding a pointless jumper trace.
-- `tracks_crossing` (4) — all four involve `+3V3`'s long diagonal run.
-  DB9 pin 5 (+3.3V) sits at the far end of each connector's physical pin
-  order from the header's own +3.3V pins, so its trace necessarily sweeps
-  across most of the header, crossing several other signals regardless of
-  layer choice (confirmed: the conflict graph isn't 2-colorable once
-  `+3V3`/`GND`'s near-complete conflict sets are in it — a genuine
-  topological limit of 2-layer routing here, not a missed assignment).
-  Down from 26 crossings in the first routing attempt after the gender
-  correction, before the GPIO reassignment above was applied.
+- `unconnected_items` (1, info-level) — `+3V3` is two disconnected copper
+  islands on this board (J1 pin 1 → J2 pin 5, and J1 pin 17 → J3 pin 5,
+  not tied together locally). Not a defect: both islands get +3.3V from
+  the Pi header's own internally-tied pins 1 and 17, so local copper
+  continuity isn't needed. Pre-existing in KiCad's own template since
+  before this HAT project touched it; cannot be "fixed" without adding a
+  pointless jumper trace.
 
 ERC is **0 errors / 0 warnings**. The schematic's cache-drift warning
 (`lib_symbol_mismatch` on J2/J3's `DE9_Socket_MountingHoles` symbol — since
@@ -215,9 +228,7 @@ once already, after the connector gender correction replaced J2/J3 with
 fresh footprint instances that needed the same trim redone.)
 
 **Before fabricating this board, resolve the corner-hole trade-off
-documented earlier**; DRC is otherwise clean apart from the `+3V3`
-crossings noted above, which need a via or manual interactive routing to
-fully clear.
+documented earlier**; DRC is otherwise fully clean (0/0).
 
 ## Verifying the board
 
@@ -227,10 +238,18 @@ kicad-cli pcb drc --severity-all genesis-controller-hat.kicad_pcb
 python3 scripts/check_pinmap.py ../Bare-Metal-Sega-Genesis/src/input/sega_board.h
 ```
 
-ERC should report 0 errors / 0 warnings. DRC will report 4 errors/0
-warnings — see "DRC and ERC status" above for the breakdown; the
-`unconnected_items` item isn't a bug, and the 4 `+3V3` crossings are a
-known pre-fab cleanup item (via or manual routing needed), not a missed
-verification step. `check_pinmap.py` (also run in CI on every push)
-confirms the schematic's actual wiring matches the firmware repo's
-`sega_board.h`.
+ERC should report 0 errors / 0 warnings. DRC should also report 0 errors
+/ 0 warnings (1 info-level `unconnected_items` note — see "DRC and ERC
+status" above, it isn't a bug). `check_pinmap.py` (also run in CI on
+every push) confirms the schematic's actual wiring matches the firmware
+repo's `sega_board.h`.
+
+## License
+
+Licensed under the [CERN Open Hardware Licence Version 2 - Strongly
+Reciprocal (CERN-OHL-S v2)](LICENSE). Anyone may use, study, modify, and
+distribute this design, including commercially — derivatives that are
+distributed (as hardware or as design files) must be released under the
+same license, with source design files made available. See the
+[CERN-OHL-S FAQ](https://ohwr.org/project/cernohl/wikis/faq) for a plain-
+language summary; the `LICENSE` file is the authoritative text.
