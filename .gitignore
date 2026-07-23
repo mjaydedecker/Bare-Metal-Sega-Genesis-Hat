@@ -16,3 +16,6 @@ __pycache__/
 
 # kicad-happy analysis cache (regenerable)
 analysis/
+
+# fab outputs (regenerable; attached to GitHub Releases instead of tracked)
+fab/
