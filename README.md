@@ -33,12 +33,13 @@ about 2mm of clearance between the two connector shells.
 
 **Also 2026-07-22:** J2/J3 were switched from KiCad's `DSUB-9_Socket_Vertical`
 footprint to `DSUB-9_Socket_Horizontal_..._EdgePinOffset7.70mm_Housed_MountingHolesOffset9.12mm`
-— the vertical footprint has its DB9 opening facing straight up (a cable
-plugs in from directly above the HAT), not out over the board edge. The
-edge-mount/right-angle footprint hangs the connector's shell 9.12mm past the
-board's bottom edge so a controller cable plugs in horizontally, console-
-style. See "Known limitation: edge-mount connectors overlap the corner
-mounting holes" below for a real trade-off this introduced.
+(later corrected to the `Pins` — male — variant of the same footprint, see
+below) — the vertical footprint has its DB9 opening facing straight up (a
+cable plugs in from directly above the HAT), not out over the board edge.
+The edge-mount/right-angle footprint hangs the connector's shell 9.12mm past
+the board's bottom edge so a controller cable plugs in horizontally,
+console-style. See "Known limitation: edge-mount connectors overlap the
+corner mounting holes" below for a real trade-off this introduced.
 
 **2026-07-22 (later the same day):** upgraded the project files from KiCad
 9 to KiCad 10 format (`kicad-cli sch upgrade` / `pcb upgrade`) after the
@@ -63,6 +64,27 @@ with the logo, title, and port labels. Back-layer text needs its "mirrored"
 flag set so it reads correctly once the board is physically flipped over;
 easy to miss when adding text via `pcbnew` scripting (the GUI does this
 automatically, scripting does not).
+
+**2026-07-22 (last, and most important):** J2/J3 were corrected from
+**female** DB9 sockets to **male** DB9 pins. This was a genuine design
+mistake, not a spec change: a real Sega Genesis controller's cable ends in
+a *female* DB9 connector, so the HAT needs *male* ports to receive it —
+the opposite of what had been built, through every earlier revision in
+this log. It was caught by physically checking two real controllers
+(original and third-party), not by any verification step in this project;
+the connector gender was never checked against a datasheet, photo, or real
+hardware before this. See
+`docs/reviews/2026-07-22-pinmap-reassignment.md` for the full correction.
+
+The fix wasn't a simple footprint swap: a male DB9's physical pin order is
+the mirror image of a female one's, left-to-right. The GPIO pin
+reassignment (done earlier the same day to fix routing crossings) had been
+carefully matched to the *female* connector's pin order, so it no longer
+avoided crossings once the connector was corrected, and had to be
+re-derived to match the male connector's actual pin order — see the
+firmware repo's updated `sega_board.h` and this repo's updated
+`docs/reviews/2026-07-22-pinmap-reassignment.md`. GPIO12/23 moved to
+spare; GPIO9/11 moved out of spare.
 
 ## Files
 
@@ -111,46 +133,57 @@ your use case, the alternatives are the same as before: a DSUB with a
 narrower bracket, or reverting to the smaller vertical-mount footprint
 (mating face up, not edge-accessible).
 
-## DRC is nearly fully clean
+## DRC and ERC status
 
 `kicad-cli pcb drc --severity-all` on `genesis-controller-hat.kicad_pcb`
-reports 1 error / 0 warnings, not zero — down from 30 errors / 6 warnings
-before the 2026-07-22 pin reassignment. `tracks_crossing`, `shorting_items`,
+reports 4 errors / 0 warnings, not zero — down from 30 errors / 6 warnings
+before the first 2026-07-22 pin reassignment. `shorting_items`,
 `solder_mask_bridge`, `hole_clearance`, `copper_edge_clearance`,
 `courtyards_overlap`, `silk_edge_clearance`, and `lib_footprint_mismatch`
-are all now **zero**. Getting the routing-related ones clean took three
-passes:
+are all now **zero**. Getting there took several passes across two
+separate reassignments (first to fix routing crossings, second to correct
+the connector gender — see the log above):
 
-1. The pin reassignment itself (see `docs/reviews/2026-07-22-pinmap-reassignment.md`)
-   eliminated same-layer crossings between J2/J3's own routing, but left
-   `shorting_items`/`solder_mask_bridge` where the resulting breakout tracks
-   skimmed past unrelated J1 pads.
-2. Each affected track (`/GPIO24`, `/GPIO23`, `/GPIO7/SPI0.CE1`, `GND`,
-   `/GPIO16`, `/GPIO12/PWM0`) was rerouted to jog around J1's row-A pins
-   instead of skimming past them — J1's two pin rows are only 2.54mm apart,
-   so a track targeting a row-B pin has to actively route around the row-A
-   pin directly in front of it, not just aim at the target. This introduced
-   2 new `tracks_crossing` errors in the resulting crowded cluster
-   (`/GPIO12/PWM0` vs `GND`, and `/GPIO24` vs `/GPIO10/SPI0.MOSI`/`+3V3`),
-   since 3+ nets ended up needing mutual separation with only 2 copper
-   layers available.
-3. Both were resolved by rerouting the *conflicting* nets out of the way
-   rather than the flagged ones: `/GPIO6` moved further left (clearing room
-   for `/GPIO12/PWM0` to approach its target from the other side, parallel
-   to `/GPIO6` instead of crossing `GND`), and `/GPIO10/SPI0.MOSI` moved to
-   `F.Cu` with its own jog around J1's row-A pins (clearing both `+3V3` and
-   `/GPIO24`, which stayed put).
+1. The first pin reassignment (see
+   `docs/reviews/2026-07-22-pinmap-reassignment.md`) eliminated same-layer
+   crossings between J2/J3's own routing for the *female* connector, but
+   left `shorting_items`/`solder_mask_bridge` where the resulting breakout
+   tracks skimmed past unrelated J1 pads.
+2. Each affected track was rerouted to jog around J1's row-A pins instead
+   of skimming past them — J1's two pin rows are only 2.54mm apart, so a
+   track targeting a row-B pin has to actively route around the row-A pin
+   directly in front of it, not just aim at the target.
+3. The connector gender correction (female → male) mirrored each
+   connector's physical pin order, which broke the first reassignment's
+   careful non-crossing correspondence. A second GPIO reassignment (see
+   the same doc) re-derived a new pin order matched to the male
+   connector's actual layout, and the row-A-jog technique was reapplied to
+   the (different) 3 nets that now need it (`GPIO24`, `GPIO7/SPI0.CE1`,
+   `GPIO16`).
 
-Remaining violation: `unconnected_items` (1) — J1's two +3.3V pins (1 and
-17) aren't tied together on this board, because they're already tied
-together upstream on the Pi itself. Pre-existing in KiCad's own template
-since before this HAT project touched it; unrelated to J2/J3, cannot be
-"fixed" without adding a pointless jumper trace.
+Remaining violations:
 
-The schematic's cache-drift warning (`lib_symbol_mismatch` on J2/J3's
-`DE9_Socket_MountingHoles` symbol) and the PCB's equivalent
-(`lib_footprint_mismatch` on J1's header footprint), both introduced by
-the KiCad 9→10 upgrade revising those library definitions, are both fixed:
+- `unconnected_items` (1) — J1's two +3.3V pins (1 and 17) aren't tied
+  together on this board, because they're already tied together upstream
+  on the Pi itself. Pre-existing in KiCad's own template since before this
+  HAT project touched it; unrelated to J2/J3, cannot be "fixed" without
+  adding a pointless jumper trace.
+- `tracks_crossing` (4) — all four involve `+3V3`'s long diagonal run.
+  DB9 pin 5 (+3.3V) sits at the far end of each connector's physical pin
+  order from the header's own +3.3V pins, so its trace necessarily sweeps
+  across most of the header, crossing several other signals regardless of
+  layer choice (confirmed: the conflict graph isn't 2-colorable once
+  `+3V3`/`GND`'s near-complete conflict sets are in it — a genuine
+  topological limit of 2-layer routing here, not a missed assignment).
+  Down from 26 crossings in the first routing attempt after the gender
+  correction, before the GPIO reassignment above was applied.
+
+ERC is **0 errors / 0 warnings**. The schematic's cache-drift warning
+(`lib_symbol_mismatch` on J2/J3's `DE9_Socket_MountingHoles` symbol — since
+superseded by the gender correction's switch to `DE9_Pins_MountingHoles`)
+and the PCB's equivalent (`lib_footprint_mismatch` on J1's header
+footprint), both introduced by the KiCad 9→10 upgrade revising those
+library definitions, were fixed:
 
 - **Schematic:** `scripts/kicad_sexpr.py` gained a
   `refresh_lib_symbol_cache(tree, lib_id)` helper that replaces a
@@ -169,19 +202,22 @@ the KiCad 9→10 upgrade revising those library definitions, are both fixed:
   circuit (I2C, UART, I2S, EEPROM ID — already inert, unreferenced by any
   track), which happened to include the "J1 pins 2/4 unused +5V" pair.
 
-`silk_edge_clearance` (was 4) is also fixed: J2/J3's outline-box silkscreen
-(drawn slightly larger than the copper, matching the connector's real
-body) had two sides running right along the board edge — J2's left side
-sat 0.025mm *past* the edge, and both connectors' outer sides dipped down
-into the rounded bottom corners, where the board narrows and the line ends
-up outside the board entirely. Nudged each offending line ~0.3mm inward
-and trimmed its length to stop before the corner begins (at y=96, just
-above where the rounding starts at y=97) — a purely cosmetic change to the
-silkscreen artwork on these two footprint instances, no change to pads,
-copper, or the connector's real footprint envelope.
+`silk_edge_clearance` is also fixed: J2/J3's outline-box silkscreen (drawn
+slightly larger than the copper, matching the connector's real body) had
+two sides running right along the board edge — one side sat fractionally
+*past* the edge, and both connectors' outer sides dipped down into the
+rounded bottom corners, where the board narrows and the line ends up
+outside the board entirely. Nudged each offending line ~0.3mm inward and
+trimmed its length to stop before the corner begins — a purely cosmetic
+change to the silkscreen artwork on these footprint instances, no change
+to pads, copper, or the connector's real footprint envelope. (Reapplied
+once already, after the connector gender correction replaced J2/J3 with
+fresh footprint instances that needed the same trim redone.)
 
 **Before fabricating this board, resolve the corner-hole trade-off
-documented earlier**; DRC is otherwise clean.
+documented earlier**; DRC is otherwise clean apart from the `+3V3`
+crossings noted above, which need a via or manual interactive routing to
+fully clear.
 
 ## Verifying the board
 
@@ -191,10 +227,10 @@ kicad-cli pcb drc --severity-all genesis-controller-hat.kicad_pcb
 python3 scripts/check_pinmap.py ../Bare-Metal-Sega-Genesis/src/input/sega_board.h
 ```
 
-ERC should report 0 errors / 0 warnings. DRC will report 1 error/0 warnings
-— see "Routing is now fully clean of crossings and shorts" above for the
-one remaining item and why it isn't a bug to fix; the schematic and PCB are
-both fully verified, no manual GUI cleanup pass is needed before fab beyond
-the corner-hole mounting decision. `check_pinmap.py` (also run in CI on
-every push) confirms the schematic's actual wiring matches the firmware
-repo's `sega_board.h`.
+ERC should report 0 errors / 0 warnings. DRC will report 4 errors/0
+warnings — see "DRC and ERC status" above for the breakdown; the
+`unconnected_items` item isn't a bug, and the 4 `+3V3` crossings are a
+known pre-fab cleanup item (via or manual routing needed), not a missed
+verification step. `check_pinmap.py` (also run in CI on every push)
+confirms the schematic's actual wiring matches the firmware repo's
+`sega_board.h`.

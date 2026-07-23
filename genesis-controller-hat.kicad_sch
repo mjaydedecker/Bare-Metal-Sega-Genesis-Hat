@@ -3041,6 +3041,509 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Connector:DE9_Pins_MountingHoles"
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "J"
+				(at 0 16.51 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "DE9_Pins_MountingHoles"
+				(at 0 14.605 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "9-pin D-SUB connector, pins (male), Mounting Hole"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "DSUB DB9"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "DSUB*Pins*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "DE9_Pins_MountingHoles_0_1"
+				(polyline
+					(pts
+						(xy -3.81 10.16)
+						(xy -2.54 10.16)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -3.81 7.62)
+						(xy 0.508 7.62)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -3.81 5.08)
+						(xy -2.54 5.08)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -3.81 2.54)
+						(xy 0.508 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -3.81 0)
+						(xy -2.54 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -3.81 -2.54)
+						(xy 0.508 -2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -3.81 -5.08)
+						(xy -2.54 -5.08)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -3.81 -7.62)
+						(xy 0.508 -7.62)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -3.81 -10.16)
+						(xy -2.54 -10.16)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -3.81 -13.335)
+						(xy -3.81 13.335)
+						(xy 3.81 9.525)
+						(xy 3.81 -9.525)
+						(xy -3.81 -13.335)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(circle
+					(center -1.778 10.16)
+					(radius 0.762)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(circle
+					(center -1.778 5.08)
+					(radius 0.762)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(circle
+					(center -1.778 0)
+					(radius 0.762)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(circle
+					(center -1.778 -5.08)
+					(radius 0.762)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(circle
+					(center -1.778 -10.16)
+					(radius 0.762)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(circle
+					(center 1.27 7.62)
+					(radius 0.762)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(circle
+					(center 1.27 2.54)
+					(radius 0.762)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(circle
+					(center 1.27 -2.54)
+					(radius 0.762)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(circle
+					(center 1.27 -7.62)
+					(radius 0.762)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+			)
+			(symbol "DE9_Pins_MountingHoles_1_1"
+				(pin passive line
+					(at -7.62 -10.16 0)
+					(length 3.81)
+					(name "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -7.62 -5.08 0)
+					(length 3.81)
+					(name "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -7.62 0 0)
+					(length 3.81)
+					(name "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -7.62 5.08 0)
+					(length 3.81)
+					(name "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -7.62 10.16 0)
+					(length 3.81)
+					(name "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -7.62 -7.62 0)
+					(length 3.81)
+					(name "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -7.62 -2.54 0)
+					(length 3.81)
+					(name "7"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "7"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -7.62 2.54 0)
+					(length 3.81)
+					(name "8"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "8"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -7.62 7.62 0)
+					(length 3.81)
+					(name "9"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "9"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -15.24 90)
+					(length 3.81)
+					(name "PAD"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "SH"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 	)
 	(text "Additional pin functions:\nhttps://pinout.xyz/"
 		(exclude_from_sim no)
@@ -3145,10 +3648,6 @@
 		(uuid "96e391a7-8c82-4811-97ab-b8aa669215f1")
 	)
 	(no_connect
-		(at 60.96 55.88)
-		(uuid "af41ac84-c2f8-4206-9486-c4f123644b97")
-	)
-	(no_connect
 		(at 73.66 55.88)
 		(uuid "cc042906-5788-48fc-aa3f-efc095e8ce5c")
 	)
@@ -3171,10 +3670,6 @@
 	(no_connect
 		(at 73.66 60.96)
 		(uuid "f72b8bc5-2774-4468-8314-5c2d934226ce")
-	)
-	(no_connect
-		(at 60.96 53.34)
-		(uuid "f98f7ba7-8f7c-462e-bb11-d7efbc8b7277")
 	)
 	(wire
 		(pts
@@ -3296,17 +3791,6 @@
 			(type solid)
 		)
 		(uuid "46f8757d-31ce-45ba-9242-48e76c9438b1")
-	)
-	(wire
-		(pts
-			(xy 73.66 45.72)
-			(xy 100.33 45.72)
-		)
-		(stroke
-			(width 0)
-			(type solid)
-		)
-		(uuid "4c544204-3530-479b-b097-35aa046ba896")
 	)
 	(wire
 		(pts
@@ -3486,17 +3970,6 @@
 	)
 	(wire
 		(pts
-			(xy 73.66 66.04)
-			(xy 100.33 66.04)
-		)
-		(stroke
-			(width 0)
-			(type solid)
-		)
-		(uuid "b73bbc85-9c79-4ab1-bfa9-ba86dc5a73fe")
-	)
-	(wire
-		(pts
 			(xy 58.42 76.2)
 			(xy 60.96 76.2)
 		)
@@ -3594,7 +4067,7 @@
 		(uuid "0bec16b3-1718-4967-abb5-89274b1e4c31")
 	)
 	(label "GPIO22"
-		(at 43.18 251.46 0)
+		(at 43.18 256.53999999999996 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3603,8 +4076,8 @@
 		)
 		(uuid "1e959b83-015b-4aaf-bbb2-1da64fbf65ef")
 	)
-	(label "GPIO10{slash}SPI0.MOSI"
-		(at 43.18 243.84 0)
+	(label "GPIO4{slash}GPCLK0"
+		(at 43.18 264.15999999999997 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3633,16 +4106,6 @@
 		)
 		(uuid "35a1cc8d-cefe-4fd3-8f7e-ebdbdbd072ee")
 	)
-	(label "GPIO23"
-		(at 100.33 45.72 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "45550f58-81b3-4113-a98b-8910341c00d8")
-	)
 	(label "GPIO4{slash}GPCLK0"
 		(at 31.75 35.56 0)
 		(effects
@@ -3653,8 +4116,8 @@
 		)
 		(uuid "5069ddbc-357e-4355-aaa5-a8f551963b7a")
 	)
-	(label "GPIO5"
-		(at 93.98 259.08 0)
+	(label "GPIO16"
+		(at 93.98 248.92000000000002 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3663,8 +4126,8 @@
 		)
 		(uuid "51001588-e3da-4241-ae63-46eb5e09f66f")
 	)
-	(label "GPIO26"
-		(at 93.98 243.84 0)
+	(label "GPIO11{slash}SPI0.SCLK"
+		(at 93.98 264.15999999999997 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3683,8 +4146,8 @@
 		)
 		(uuid "591fa762-d154-4cf7-8db7-a10b610ff12a")
 	)
-	(label "GPIO17"
-		(at 43.18 259.08 0)
+	(label "GPIO10{slash}SPI0.MOSI"
+		(at 43.18 248.92000000000002 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3703,8 +4166,8 @@
 		)
 		(uuid "5f2ee32f-d6d5-4b76-8935-0d57826ec36e")
 	)
-	(label "GPIO4{slash}GPCLK0"
-		(at 43.18 261.62 0)
+	(label "GPIO9{slash}SPI0.MISO"
+		(at 43.18 246.38 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3723,8 +4186,8 @@
 		)
 		(uuid "6a63dbe8-50e2-4ffb-a55f-e0df0f695e9b")
 	)
-	(label "GPIO13{slash}PWM1"
-		(at 93.98 248.92 0)
+	(label "GPIO5"
+		(at 93.98 259.08000000000004 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3743,8 +4206,8 @@
 		)
 		(uuid "831c710c-4564-4e13-951a-b3746ba43c78")
 	)
-	(label "GPIO7{slash}SPI0.CE1"
-		(at 93.98 261.62 0)
+	(label "GPIO26"
+		(at 93.98 246.38 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3753,8 +4216,8 @@
 		)
 		(uuid "8a4238f8-8a28-42c4-82df-1a573b1b8f56")
 	)
-	(label "GPIO27"
-		(at 43.18 254 0)
+	(label "GPIO24"
+		(at 43.18 254.0 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3763,8 +4226,8 @@
 		)
 		(uuid "8dc4c580-c837-4b36-9858-445865818b17")
 	)
-	(label "GPIO16"
-		(at 93.98 246.38 0)
+	(label "GPIO7{slash}SPI0.CE1"
+		(at 93.98 261.62 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3783,8 +4246,8 @@
 		)
 		(uuid "9316d4cc-792f-4eb9-8a8b-1201587737ed")
 	)
-	(label "GPIO12{slash}PWM0"
-		(at 93.98 251.46 0)
+	(label "GPIO6"
+		(at 93.98 256.53999999999996 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3793,8 +4256,8 @@
 		)
 		(uuid "a5bfbb51-f15e-41ab-976e-f60d7bb5f504")
 	)
-	(label "GPIO6"
-		(at 93.98 254 0)
+	(label "GPIO13{slash}PWM1"
+		(at 93.98 254.0 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3802,16 +4265,6 @@
 			(justify left bottom)
 		)
 		(uuid "a8f8d6d3-97a4-49d3-98a4-6aa1c0815709")
-	)
-	(label "GPIO12{slash}PWM0"
-		(at 100.33 66.04 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "a9ed66d3-a7fc-4839-b265-b9a21ee7fc85")
 	)
 	(label "GPIO13{slash}PWM1"
 		(at 31.75 68.58 0)
@@ -3843,8 +4296,8 @@
 		)
 		(uuid "be4b9f73-f8d2-4c28-9237-5d7e964636fa")
 	)
-	(label "GPIO23"
-		(at 43.18 248.92 0)
+	(label "GPIO27"
+		(at 43.18 259.08000000000004 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3853,8 +4306,8 @@
 		)
 		(uuid "bfbf1b85-d32b-4adc-bf17-08b9e499c1f6")
 	)
-	(label "GPIO24"
-		(at 43.18 246.38 0)
+	(label "GPIO17"
+		(at 43.18 261.62 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4282,7 +4735,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector:DE9_Socket_MountingHoles")
+		(lib_id "Connector:DE9_Pins_MountingHoles")
 		(at 101.6 254 0)
 		(unit 1)
 		(body_style 1)
@@ -4302,7 +4755,7 @@
 				)
 			)
 		)
-		(property "Value" "DE9_Socket_MountingHoles"
+		(property "Value" "DE9_Pins_MountingHoles"
 			(at 101.6 238.125 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4385,7 +4838,7 @@
 	)
 	(symbol
 		(lib_id "power:+3.3V")
-		(at 93.98 264.16 0)
+		(at 93.98 243.83999999999997 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -4532,7 +4985,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector:DE9_Socket_MountingHoles")
+		(lib_id "Connector:DE9_Pins_MountingHoles")
 		(at 50.8 254 0)
 		(unit 1)
 		(body_style 1)
@@ -4552,7 +5005,7 @@
 				)
 			)
 		)
-		(property "Value" "DE9_Socket_MountingHoles"
+		(property "Value" "DE9_Pins_MountingHoles"
 			(at 50.8 238.125 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4635,7 +5088,7 @@
 	)
 	(symbol
 		(lib_id "power:+3.3V")
-		(at 43.18 264.16 0)
+		(at 43.18 243.83999999999997 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -4709,7 +5162,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 93.98 256.54 0)
+		(at 93.98 251.45999999999998 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -4857,7 +5310,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 43.18 256.54 0)
+		(at 43.18 251.45999999999998 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -4933,5 +5386,55 @@
 		(path "/"
 			(page "1")
 		)
+	)
+	(no_connect
+		(at 73.66 45.72)
+		(uuid 85804238-75de-4699-848c-1b8a1060ba7e)
+	)
+	(no_connect
+		(at 73.66 66.04)
+		(uuid c0848523-c500-4bda-b8d7-0f6f0d8e0cb0)
+	)
+	(wire
+		(pts
+			(xy 60.96 53.34)
+			(xy 31.75 53.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid cb62769f-fe5a-4005-9985-3fdac1c348a5)
+	)
+	(label "GPIO9{slash}SPI0.MISO"
+		(at 31.75 53.34 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "cca65a05-e801-453b-9ae1-bc23280e16c0")
+	)
+	(wire
+		(pts
+			(xy 60.96 55.88)
+			(xy 31.75 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid 110e064c-ce81-4f31-a247-a75a7f050465)
+	)
+	(label "GPIO11{slash}SPI0.SCLK"
+		(at 31.75 55.88 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "e6872ef9-6508-4312-b429-e0ebb38f8982")
 	)
 )

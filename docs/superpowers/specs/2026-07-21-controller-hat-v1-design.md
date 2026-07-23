@@ -5,11 +5,13 @@
 
 ## Goal
 
-A passive Raspberry Pi add-on board ("HAT") that exposes two female DB9 (DE-9)
-ports for original Sega Genesis / Mega Drive controllers, wired directly to the
-Pi's 40-pin GPIO header per the electrical contract and pin assignment already
-defined in the firmware repo (`Bare-Metal-Sega-Genesis`, `src/input/sega_board.h`
-and `docs/superpowers/specs/2026-06-25-gpio-sega-controllers-design.md`).
+A passive Raspberry Pi add-on board ("HAT") that exposes two male DB9 (DE-9)
+ports for original Sega Genesis / Mega Drive controllers (Genesis controller
+cables end in a female DB9 connector, so the HAT needs male ports to mate
+with them), wired directly to the Pi's 40-pin GPIO header per the electrical
+contract and pin assignment already defined in the firmware repo
+(`Bare-Metal-Sega-Genesis`, `src/input/sega_board.h` and
+`docs/superpowers/specs/2026-06-25-gpio-sega-controllers-design.md`).
 
 This project owns the physical board only. It has no firmware of its own — the
 kernel repo is agnostic to this board via its `BoardPinMap` abstraction, so this
@@ -48,8 +50,8 @@ design's only job is to match that contract exactly.
 
 - **J1** — 2×20 female header, standard 0.1" pitch, plain (non-stacking),
   positioned to mate with the Pi's 40-pin GPIO header.
-- **J2** — DB9 (DE-9) female socket, right-angle/edge-mount, Player 1.
-- **J3** — DB9 (DE-9) female socket, right-angle/edge-mount, Player 2.
+- **J2** — DB9 (DE-9) male pins, right-angle/edge-mount, Player 1.
+- **J3** — DB9 (DE-9) male pins, right-angle/edge-mount, Player 2.
 - J2 and J3 sit side-by-side along the board's bottom edge, opposite the GPIO
   header side, with their shells overhanging the board edge (9.12mm) so
   controller cables plug in horizontally at the board's edge, console-style.
@@ -59,6 +61,14 @@ design's only job is to match that contract exactly.
   board's corner mounting holes at this board width, so the two affected
   holes (`MH3`/`MH4`) were removed — see the HAT repo's `README.md` "Known
   limitation: only 2 of the 4 official corner mounting holes remain".
+  **Updated again 2026-07-22 (same day):** the connectors were corrected
+  from female sockets (`DE9_Socket`) to male pins (`DE9_Pins`) — an original
+  Genesis controller's cable ends in a female DB9, so the HAT needs male
+  ports, not female, to receive it. This was never actually verified
+  against a real controller or datasheet until physically checked; see the
+  HAT repo's `docs/reviews/2026-07-22-pinmap-reassignment.md` for the full
+  correction, including the GPIO pin reassignment it required (a male
+  connector's pin order mirrors a female one's).
 - No other active or passive components (no resistors, diodes, LEDs, EEPROM,
   or fuses).
 

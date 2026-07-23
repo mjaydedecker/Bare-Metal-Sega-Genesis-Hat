@@ -1,7 +1,12 @@
 # GPIO Pin Reassignment for Zero-Crossing Routing
 
-**Date:** 2026-07-22
+**Date:** 2026-07-22 (two separate reassignments, same day)
 **Status:** Implemented (firmware repo + this HAT repo)
+
+This document covers two reassignments done the same day: the first to fix
+routing crossings (below), the second (see "Second reassignment" near the
+bottom) to correct a wrong connector gender that had been designed against
+without ever being checked.
 
 ## Background
 
@@ -91,7 +96,7 @@ requiring a different pin assignment or connector placement. All other
 categories are unchanged, pre-existing conditions (see this repo's
 `README.md` "Known limitation" sections for the itemized breakdown).
 
-## Changes made
+## Changes made (first reassignment)
 
 - Firmware repo (`Bare-Metal-Sega-Genesis`): `src/input/sega_board.h`
   (`kBoardPinMap`), `test/test_sega_board.cpp` (updated assertions),
@@ -104,3 +109,92 @@ categories are unchanged, pre-existing conditions (see this repo's
 - `.github/workflows/verify-pinmap.yml` + `scripts/check_pinmap.py` (added
   separately) now catch any future drift between the two repos' pin maps
   automatically, on every push.
+
+## Second reassignment: connector gender correction
+
+Later the same day, J2/J3 were found to be **female** DB9 sockets when a
+real Sega Genesis controller's cable ends in a **female** DB9 connector —
+the HAT needs **male** ports, the opposite of what had been built. This was
+never checked against a datasheet, photo, or real hardware at any point
+before this; it was caught only by physically inspecting two real
+controllers (original and third-party) after being asked directly whether
+the connector gender was correct.
+
+### Why the first reassignment stopped working
+
+A male DB9's physical pin order is the mirror image of a female one's,
+left-to-right (pin 1 stays put; every other pin reflects to the opposite
+side). The reassignment above was matched to the *female* pin order:
+
+```
+Female J2/J3 physical order (left to right): +3.3V, D5, D2, GND, SELECT, D1, D4, D0
+Male J2/J3 physical order (left to right):   D0, D4, D1, SELECT, GND, D2, D5, +3.3V
+```
+
+Swapping the footprint without re-deriving the assignment produced a
+conflict graph with **65 edges that was not 2-colorable** (verified by
+building the actual conflict graph and attempting a bipartite coloring,
+not just inspecting it by eye) — the breakout order and target order were
+now almost fully reversed, the worst case for same-layer routing.
+
+### New assignment
+
+Re-derived the same way as the first reassignment, but matched to the
+male connector's actual left-to-right pin order (`D0, D4, D1, SELECT, D2,
+D3, D5`), using the lowest 7 available GPIO columns for Port 1 and the
+highest 7 for Port 2, each assigned in that same order so breakout order
+and target order stay monotonic:
+
+| Signal               | DB9 pin | Port 1 (J2) | Port 2 (J3) |
+|-----------------------|---------|-------------|-------------|
+| SELECT (output)       | 7       | GPIO22      | GPIO6       |
+| D0 -- Up              | 1       | GPIO4       | GPIO11      |
+| D1 -- Down            | 2       | GPIO27      | GPIO5       |
+| D2 -- Left            | 3       | GPIO24      | GPIO13      |
+| D3 -- Right           | 4       | GPIO10      | GPIO16      |
+| D4 -- TL (B / A)      | 6       | GPIO17      | GPIO7       |
+| D5 -- TR (C / Start)  | 9       | GPIO9       | GPIO26      |
+
+GPIO12/23 (used by the first reassignment) move to spare; GPIO9/11
+(previously spare) are now used. Reservations are unchanged.
+
+A pure-diagonal, single-layer crossing check against this assignment
+(same technique as the first reassignment's validation) found **zero**
+crossings — confirmed computationally before implementing, not assumed
+from the monotonic-order argument alone.
+
+### Result
+
+| DRC category | Before 2nd reassignment (male footprint, old GPIO map) | After 2nd reassignment |
+|---|:---:|:---:|
+| `tracks_crossing` (simple diagonal, pre-jog) | 26 | 0 |
+| `tracks_crossing` (final, with row-A jogs + `+3V3`/`GND` routing) | n/a | 4 |
+| `shorting_items` | 2 | 0 |
+| `solder_mask_bridge` | 1 | 0 |
+| `copper_sliver` | 1 | 0 |
+| **Total DRC errors/warnings** | n/a | **4 / 0** |
+
+The 4 residual `tracks_crossing` all involve `+3V3`: DB9 pin 5 sits at the
+far end of each connector's mirrored pin order from the header's own
++3.3V pins (J1 pins 1 and 17), so its trace necessarily sweeps across most
+of the header. Building the conflict graph confirmed `+3V3` and `GND`
+conflict with nearly every other net (15 and 9 conflicts respectively out
+of 16 possible) — not 2-colorable, a genuine topological limit of 2-layer
+routing for this specific connector's pin order, not a missed layer
+assignment. Swapping which of J1's two +3.3V pins each port uses doesn't
+help: J3 is far from both (26.3mm to the nearer one, 46.6mm to the other),
+so its `+3V3` diagonal is long either way.
+
+### Changes made (second reassignment)
+
+- Firmware repo: `src/input/sega_board.h`, `test/test_sega_board.cpp`,
+  `docs/superpowers/specs/2026-06-25-gpio-sega-controllers-design.md`
+  (same files as the first reassignment, updated again).
+- This repo: schematic symbols swapped `Connector:DE9_Socket_MountingHoles`
+  → `Connector:DE9_Pins_MountingHoles` on J2/J3 (with all labels mirrored
+  to match the new pin geometry, and J1's own GPIO9/GPIO11 wiring
+  activated / GPIO12/GPIO23 wiring freed to match); PCB footprints swapped
+  `DSUB-9_Socket_Horizontal_...` → `DSUB-9_Pins_Horizontal_...` on J2/J3
+  (re-placed since the mounting holes also mirror position, fully
+  re-routed); `scripts/check_pinmap.py` updated for the mirrored pin
+  offsets; `README.md`, this doc, and the design spec updated.

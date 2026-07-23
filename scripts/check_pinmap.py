@@ -23,16 +23,22 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
 import kicad_sexpr as ks  # noqa: E402
 
-# DE9_Socket_MountingHoles local pin offsets (from KiCad's Connector.kicad_sym),
+# DE9_Pins_MountingHoles local pin offsets (from KiCad's Connector.kicad_sym),
 # relative to the symbol's own placement anchor. x is fixed per pin column;
 # y varies per pin. Placing a symbol at rotation 0 puts pin N's absolute
 # position at (anchor_x + local_x, anchor_y - local_y) -- KiCad negates the
 # local Y offset on placement (library coordinates increase upward, page
 # coordinates increase downward).
+#
+# DE9_Pins (male) mirrors DE9_Socket (female) in Y around pin 3 (local y=0):
+# a real male DB9's pin layout is the mirror image of a female one when
+# both are drawn from the same schematic vantage point. Confirmed 2026-07-22
+# when J2/J3 were corrected from DE9_Socket to DE9_Pins (Genesis controllers
+# have female cable ends, so the HAT needs male ports, not female sockets).
 LOCAL_PIN_XY = {
-    "1": (-7.62, 10.16), "6": (-7.62, 7.62), "2": (-7.62, 5.08),
-    "7": (-7.62, 2.54), "3": (-7.62, 0.0), "8": (-7.62, -2.54),
-    "4": (-7.62, -5.08), "9": (-7.62, -7.62), "5": (-7.62, -10.16),
+    "1": (-7.62, -10.16), "6": (-7.62, -7.62), "2": (-7.62, -5.08),
+    "7": (-7.62, -2.54), "3": (-7.62, 0.0), "8": (-7.62, 2.54),
+    "4": (-7.62, 5.08), "9": (-7.62, 7.62), "5": (-7.62, 10.16),
 }
 
 # DB9 pin -> sega_board.h role. Pin 7 is SELECT; pins 1,2,3,4,6,9 are
